@@ -5,8 +5,10 @@
 
 # Meme convention
 
-> "Needed explaining, That humor flopped."
-> -Shuka World-
+<div style="text-align: center; font-size: 1.5em; font-style: italic; margin-top: 1em;">
+  "Needed explaining, That humor flopped."
+  <br> -Shuka World-
+</div>
 
 This repository is a randomly autocomplete of meme for developers and researchers.
 It is designed to make writing more engaging and fun by suggesting memes that are relevant to the content being written.
