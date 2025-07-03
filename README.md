@@ -14,7 +14,7 @@ It is designed to make writing more engaging and fun by suggesting memes that ar
   <img src="resources/readme/sleep_clap.gif" width="250" />
   &nbsp; <!-- adds spacing -->
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="200" />
+  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="180" />
   &nbsp;&nbsp;&nbsp;
   <img src="resources/readme/koojacheol_why.gif" width="280" />
 </p>
