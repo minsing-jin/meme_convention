@@ -5,6 +5,8 @@
 
 # Meme convention
 
+> "Needed explaining, That humor flopped."
+
 This repository is a randomly autocomplete of meme for developers and researchers.
 It is designed to make writing more engaging and fun by suggesting memes that are relevant to the content being written.
 
