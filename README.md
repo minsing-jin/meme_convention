@@ -12,7 +12,8 @@ It is designed to make writing more engaging and fun by suggesting memes that ar
 
 # ⚡️ Motivation
 1. Many developer and researcher write in many situations. But I think that their writing is not engaging and fun.
-<img src="./meme_convention/resources/readme/sleep_clap.gif" alt="sleep clap" width="300">
+![sleep clap](./meme_convention/resources/readme/sleep_clap.gif)
+
 2. In code reviews or issue discussions, plain text can come off as cold—like a robot wrote it—and might accidentally hurt someone's feelings or spark misunderstandings.
 3. I believe that memes can help to make writing more engaging and fun, and can also help to clarify(???) the meaning of the text.
 
