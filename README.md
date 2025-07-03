@@ -14,9 +14,9 @@ It is designed to make writing more engaging and fun by suggesting memes that ar
   <img src="resources/readme/sleep_clap.gif" width="250" />
   &nbsp; <!-- adds spacing -->
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="150" />
+  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="200" />
   &nbsp;&nbsp;&nbsp;
-  <img src="resources/readme/koojacheol_why.gif" width="250" />
+  <img src="resources/readme/koojacheol_why.gif" width="280" />
 </p>
 
 1. Many developer and researcher write in many situations. But I think that their writing is not engaging and fun.
