@@ -1,22 +1,27 @@
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="350">
-</p>
 
 # 👾Meme convention
 
 > _"Needed explaining. That humor flopped."_  
->  — Shuka World-
+>  — Youtuber Shuka World-
 
 This repository is a randomly autocomplete of meme for developers and researchers.
 It is designed to make writing more engaging and fun by suggesting memes that are relevant to the content being written.
 
 
 # ⚡️ Motivation
-<img src="resources/readme/sleep_clap.gif" width="300">
 
 1. Many developer and researcher write in many situations. But I think that their writing is not engaging and fun.
+<p align="center">
+    <img src="resources/readme/sleep_clap.gif" width="300">
+</p>
 
 2. In code reviews or issue discussions, plain text can come off as cold—like a robot wrote it—and might accidentally hurt someone's feelings or spark misunderstandings.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="300">
+</p>
+
+
 3. I believe that memes can help to make writing more engaging and fun, and can also help to clarify(???) the meaning of the text.
 
 I've decided to ditch the dull writing—tech writing should be fun and easy to read.
@@ -41,6 +46,10 @@ You can also contribute to this repository by adding your own memes.
 
 # 🚗 Roadmap
 This project might be chrome extension or vscode extension or other editor extension.(not discussed yet)
+
+<p align="center">
+    <img src="resources/readme/dr_strange.gif" width="300">
+</p>
 
 - [ ] Create a meme(I added) convention and autocomplete for developers and researchers when they write something in github situation. (Code review, issue discussion, etc.)
 - [ ] Create a meme autocomplete for all developers and researchers when they write something in their code editor.
