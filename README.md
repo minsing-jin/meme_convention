@@ -12,7 +12,7 @@ It is designed to make writing more engaging and fun by suggesting memes that ar
 
 
 # ⚡️ Motivation
-<img src="resources/readme/sleep_clap.gif" width="300">)
+<img src="resources/readme/sleep_clap.gif" width="300">
 
 1. Many developer and researcher write in many situations. But I think that their writing is not engaging and fun.
 
