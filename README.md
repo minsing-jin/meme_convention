@@ -1,14 +1,12 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="400">
+  <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="350">
 </p>
 
 
 # Meme convention
 
-<div style="text-align: center; font-size: 1.5em; font-style: italic; margin-top: 1em;">
-  "Needed explaining, That humor flopped."
-  <br> -Shuka World-
-</div>
+> _"Needed explaining. That humor flopped."_  
+> **— Shuka World**
 
 This repository is a randomly autocomplete of meme for developers and researchers.
 It is designed to make writing more engaging and fun by suggesting memes that are relevant to the content being written.
