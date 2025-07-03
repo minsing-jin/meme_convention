@@ -3,7 +3,7 @@
 </p>
 
 ![image](https://github.com/user-attachments/assets/20d93c2e-14f0-45b8-9d44-15dd1705ca84)
-<img src="https://github.com/user-attachments/assets/20d93c2e-14f0-45b8-9d44-15dd1705ca84" width="40" height="40" />
+<img src="https://github.com/user-attachments/assets/20d93c2e-14f0-45b8-9d44-15dd1705ca84.gif" width="40" height="40" />
 # 👾Meme convention
 
 > _"Needed explaining. That humor flopped."_  
