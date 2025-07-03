@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc)
+
 # Meme convention
 
 This repository is a randomly autocomplete of meme for developers and researchers.
