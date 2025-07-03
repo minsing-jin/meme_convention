@@ -4,7 +4,7 @@
 > _"Needed explaining, That humor flopped."_  
 >  — Youtuber Shuka World-
 
-This repository is a randomly autocomplete of meme for developers and researchers.
+This repository is a randomly autocomplete of meme for developers and researchers fit context.
 It is designed to make writing more engaging and fun by suggesting memes that are relevant to the content being written.
 
 
