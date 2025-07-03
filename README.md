@@ -1,6 +1,8 @@
 <p align="center">
   <img src="[http://some_place.com/image.png](https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc)" />
 </p>
+
+
 # Meme convention
 
 This repository is a randomly autocomplete of meme for developers and researchers.
