@@ -2,8 +2,6 @@
   <img src="https://github.com/user-attachments/assets/0c5074ef-d235-4a70-9292-9c33c3fb8dcc" width="350">
 </p>
 
-![image](https://github.com/user-attachments/assets/20d93c2e-14f0-45b8-9d44-15dd1705ca84)
-<img src="https://github.com/user-attachments/assets/20d93c2e-14f0-45b8-9d44-15dd1705ca84.gif" width="40" height="40" />
 # 👾Meme convention
 
 > _"Needed explaining. That humor flopped."_  
@@ -14,6 +12,7 @@ It is designed to make writing more engaging and fun by suggesting memes that ar
 
 # ⚡️ Motivation
 1. Many developer and researcher write in many situations. But I think that their writing is not engaging and fun.
+<img src="./meme_convention/resources/readme/sleep_clap.gif" alt="sleep clap" width="300">
 2. In code reviews or issue discussions, plain text can come off as cold—like a robot wrote it—and might accidentally hurt someone's feelings or spark misunderstandings.
 3. I believe that memes can help to make writing more engaging and fun, and can also help to clarify(???) the meaning of the text.
 
