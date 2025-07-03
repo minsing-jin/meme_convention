@@ -1,7 +1,7 @@
 
 # 👾Meme convention
 
-> _"Needed explaining. That humor flopped."_  
+> _"Needed explaining, That humor flopped."_  
 >  — Youtuber Shuka World-
 
 This repository is a randomly autocomplete of meme for developers and researchers.
