@@ -52,7 +52,8 @@ This project might be chrome extension or vscode extension or other editor exten
 
 - [ ] Create a meme(I added) convention and autocomplete for developers and researchers when they write something in github situation. (Code review, issue discussion, etc.)
 - [ ] Create a meme autocomplete for all developers and researchers when they write something in their code editor.
-- [ ] Check people's reaction to the meme convention and autocomplete and decided to whether continue or not.
+- [ ] Check people's reaction to the meme convention and autocomplete and decided to whether continue or not.(in developer)
+- [ ] If this project is successful, release it as a chrome extension or vscode extension to expand its reach and usability.
 - [ ] Add many genre of meme such as sports, movies, game, animation.... to make sympathize with more people.
 - [ ] Create a meme autocomplete for all writing long form writing. This step meme can be used in many blogs, articles and other places.
 - [ ] Create a meme convention for all people. This step meme can be used in social media, forums and other places.
