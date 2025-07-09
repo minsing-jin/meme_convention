@@ -1,5 +1,6 @@
 import psycopg2
 
+# TODO: Maybe this will be implemented in the future
 def create_table():
     """
     Create a table in PostgreSQL database to store memes.
