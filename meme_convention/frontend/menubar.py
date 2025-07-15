@@ -1,27 +1,48 @@
-# import rumps
-# from meme_convention.meme_feature.autocomplete import AutoComplete
+# from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+# from PyQt5.QtGui import QIcon, QPixmap
+# from PyQt5.QtCore import QTimer
+# import sys
 #
-# class MemeMenuBarApp(rumps.App):
+#
+# class AnimatedTrayIcon:
 #     def __init__(self):
-#         super(MemeMenuBarApp, self).__init__("🎭", quit_button=None)
-#         self.menu = ["Show Meme", "Settings", "Quit"]
+#         self.app = QApplication(sys.argv)
+#         self.app.setQuitOnLastWindowClosed(False)
 #
-#     @rumps.clicked("Show Meme")
-#     def show_meme(self, _):
-#         # Trigger your meme display function
-#         self.show_meme_gui()
+#         # Create tray icon
+#         self.tray = QSystemTrayIcon()
+#         self.tray.setVisible(True)
 #
-#     @rumps.clicked("Settings")
-#     def settings(self, _):
-#         rumps.alert("Settings", "Configure your meme preferences here")
+#         # Load GIF frames
+#         self.frames = []
+#         self.current_frame = 0
+#         self.load_gif_frames()
 #
-#     @rumps.clicked("Quit")
-#     def quit_app(self, _):
-#         rumps.quit_application()
+#         # Set up animation timer
+#         self.timer = QTimer()
+#         self.timer.timeout.connect(self.update_icon)
+#         self.timer.start(100)  # Update every 100ms
 #
-#     def show_meme_gui(self):
-#         autocomplete = AutoComplete(None, None, None)
-#         autocomplete.gui_display_meme("pr")
+#         # Create context menu
+#         menu = QMenu()
+#         quit_action = menu.addAction("Quit")
+#         quit_action.triggered.connect(self.app.quit)
+#         self.tray.setContextMenu(menu)
+#
+#     def load_gif_frames(self):
+#         # Load your GIF frames here
+#         # Convert each frame to QIcon
+#         pass
+#
+#     def update_icon(self):
+#         if self.frames:
+#             self.tray.setIcon(self.frames[self.current_frame])
+#             self.current_frame = (self.current_frame + 1) % len(self.frames)
+#
+#     def run(self):
+#         self.app.exec_()
+#
 #
 # if __name__ == "__main__":
-#     MemeMenuBarApp().run()
+#     app = AnimatedTrayIcon()
+#     app.run()
