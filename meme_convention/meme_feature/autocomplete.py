@@ -1,5 +1,5 @@
 from meme_convention.db.user import User
-from utils.gui import *
+from meme_convention.frontend.gui import *
 import tkinter as tk
 import io
 
