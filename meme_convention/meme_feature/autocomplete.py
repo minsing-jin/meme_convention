@@ -1,8 +1,5 @@
 from meme_convention.db.user import User
-from tkinter import messagebox
-from PIL import Image, ImageTk
 from utils.gui import *
-import pyperclipimg as pci
 import tkinter as tk
 import io
 
@@ -17,7 +14,10 @@ class AutoComplete:
 
     def autocomplete(self, user_choice, context_category_lst):
         """
-        # TODO: Autocomplete the multimodal based on the model and context category in the future.
+        # TODO: I have to implement the autocomplete function in the future. This issue will be implemented in issue #16.
+        1. Implement the gui and autoCopy functionality for the autocomplete.
+        2. Autocomplete the multimodal based on the model and context category in the future.
+        3. Autocomplete in user's text box and page image context.
         """
 
         # TODO: Analyze the text and image to determine the context category
@@ -32,26 +32,26 @@ class AutoComplete:
     def gui_display_meme(self, context):
         """GUI for displaying memes and accepting/rejecting them."""
         root = tk.Tk()
-        root.title("Meme Viewer")
+        root.title("Select your optimal meme!")
         label = tk.Label(root)
         label.pack()
 
-        meme = self.user_db.get_random_meme(context)
-        meme_img = Image.open(io.BytesIO(bytes(meme[-1])))
+        gui = GUI(root, label, None, context, self.user_db.get_random_meme)
 
-        btn_accept = tk.Button(root, text="Accept (Copy)", command=accept(root, meme_img))
+        btn_accept = tk.Button(root, text="Accept (Ctrl + c | Cmd + c)", command=gui.accept)
         btn_accept.pack(side="left", padx=10, pady=10)
 
-        btn_reject = tk.Button(root, text="Reject (Next Meme)", command=reject(label, meme_img))
+        btn_reject = tk.Button(root, text="Next Meme(Up down key)", command=gui.reject)
         btn_reject.pack(side="left", padx=10, pady=10)
 
-        btn_quit = tk.Button(root, text="Exit", command=quit_app(root))
+        btn_quit = tk.Button(root, text="Exit (esc)", command=gui.quit_app)
         btn_quit.pack(side="left", padx=10, pady=10)
 
-        root.bind('<Control-c>', accept)
-        root.bind('<Up>', reject)
-        root.bind('<Down>', reject)
-        root.bind('<Escape>', quit_app)
+        meme = root.bind('<Control-c>', gui.accept)
+        meme = root.bind('<Command-c>', gui.accept)
+        root.bind('<Up>', gui.reject)
+        root.bind('<Down>', gui.reject)
+        root.bind('<Escape>', gui.quit_app)
 
         root.mainloop()
         return meme
@@ -61,7 +61,7 @@ class AutoComplete:
         """
         Classify and analyze the context category based on the text and page.
         """
-        # TODO: Autocomplete the multimodal based on the model and context category in the future.
+        # TODO: Autocomplete meme using text record and multimodal based on the model, extract context category in the future.
         # context = self.analysis_model.analyze(self.text, self.page_image, context_category=context_category_lst)
 
         # For now, we will just return the user choice if it is valid
