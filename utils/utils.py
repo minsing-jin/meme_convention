@@ -1,6 +1,5 @@
 import io
 from PIL import Image, ImageTk, ImageSequence
-
 from meme_convention.db.user import User
 
 def sample_image_upload(context_category, picture_name, path_to_image):
