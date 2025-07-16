@@ -4,46 +4,51 @@ import pyperclip
 import tempfile
 
 
-def play_animated_image(meme_img, label, anim_id=None):
-    """
-    Play an animated GIF image in a Tkinter label widget.
-    :param meme_img: PIL Image object of the animated GIF.
-    :param label: Tkinter Label widget where the GIF will be displayed.
-    :param anim_id: Optional ID for the animation callback, used to stop the animation.
+class GIFAnimator:
+    def __init__(self, meme_img, label):
+        self.meme_img = meme_img
+        self.label = label
+        self.frames = []
+        self.durations = []
+        self.current_frame = 0
+        self.anim_id = None
+        self.load_frames()
 
-    :return: The ID of the animation callback. This can be used to stop the animation later.
-    anmin_id is for preventing multiple animations running at the same time when user draw another meme.
-    """
-    frames = []
-    durations = []
-    try:
-        while True:
-            frame = meme_img.copy()
-            frames.append(ImageTk.PhotoImage(frame))
-            duration = meme_img.info.get('duration', 100)
-            durations.append(duration)
-            meme_img.seek(meme_img.tell() + 1)
-    except EOFError:
-        pass
-    current_frame = 0
-    anim_id = animate_gif(current_frame=current_frame, frames=frames,
-                          durations=durations, label=label, anim_id=anim_id)
-    return anim_id
+    def load_frames(self):
+        """Load all frames and durations from the GIF"""
+        try:
+            while True:
+                frame = self.meme_img.copy()
+                self.frames.append(ImageTk.PhotoImage(frame))
+                duration = self.meme_img.info.get('duration', 100)
+                self.durations.append(duration)
+                self.meme_img.seek(self.meme_img.tell() + 1)
+        except EOFError:
+            pass
+
+    def start_animation(self):
+        """Start the GIF animation"""
+        self.current_frame = 0
+        self.animate()
+
+    def animate(self):
+        """Animate the GIF by cycling through frames"""
+        frame = self.frames[self.current_frame]
+        self.label.config(image=frame)
+        self.label.image = frame
+
+        delay = self.durations[self.current_frame]
+        self.current_frame = (self.current_frame + 1) % len(self.frames)
+        self.anim_id = self.label.after(delay, self.animate)
+
+    def stop_animation(self):
+        """Stop the current animation"""
+        if self.anim_id is not None:
+            self.label.after_cancel(self.anim_id)
+            self.anim_id = None
 
 
-def animate_gif(current_frame, frames, durations, label, anim_id=None):
-    frame = frames[current_frame]
-    label.config(image=frame)
-    label.image = frame
-    delay = durations[current_frame]
-    current_frame = (current_frame + 1) % len(frames)
-    anim_id = label.after(delay,
-                          lambda cf=current_frame: animate_gif(cf, frames,
-                                                               durations, label, anim_id))
-    return anim_id
-
-
-class GifProcessor:
+class GIFProcessor:
     def __init__(self):
         pass
 

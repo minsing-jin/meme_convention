@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-from meme_convention.frontend.image_processor import GifProcessor, play_animated_image
+from meme_convention.frontend.image_processor import GIFProcessor, GIFAnimator
 import pyperclipimg as pci
 import pyperclip
 import io
@@ -14,33 +14,28 @@ class GUI:
         self.root = root
         self.label = label
         self.meme_img = img
-
         self.meme_io = None
-
+        self.meme_io = None
         self.context = context
         self.get_image_func = get_image_func
-        self.anim_id = None  # Track animation callback
+        self.gif_animator = None  # Replace anim_id with gif_animator
 
         self.show_image()
 
-    # TODO: solve the issue gif meme image copy issue not png
     def show_image(self, event=None):
-        """anmin_id is for preventing multiple animations running at the same time when user draw another meme."""
-
         # Stop previous animation if running
-        if self.anim_id is not None:
-            self.label.after_cancel(self.anim_id)
-            self.anim_id = None
+        if self.gif_animator is not None:
+            self.gif_animator.stop_animation()
+            self.gif_animator = None
 
         meme = self.get_image_func(self.context)
         self.meme_img = Image.open(io.BytesIO(bytes(meme[-1])))
-
         self.meme_io = io.BytesIO(bytes(meme[-1]))
-        print(self.meme_img)
-        print("bytes io: ", io.BytesIO(bytes(meme[-1])))
 
         if getattr(self.meme_img, "is_animated", False):
-            self.anim_id = play_animated_image(self.meme_img, self.label, self.anim_id)
+            # Create and start GIF animator
+            self.gif_animator = GIFAnimator(self.meme_img, self.label)
+            self.gif_animator.start_animation()
         else:
             photo = ImageTk.PhotoImage(self.meme_img)
             self.label.config(image=photo)
@@ -50,9 +45,8 @@ class GUI:
         try:
             # Check if the image is animated (GIF)
             if getattr(self.meme_img, "is_animated", False):
-                gif_processor = GifProcessor()
+                gif_processor = GIFProcessor()
                 gif_processor.send_gif_to_clipboard(self.root, self.meme_io)
-
             else:
                 # For static images, use your existing pyperclipimg method
                 pci.copy(self.meme_img)
@@ -73,6 +67,9 @@ class GUI:
         self.show_image()
 
     def quit_app(self, event=None):
+        # Clean up animation before closing
+        if self.gif_animator is not None:
+            self.gif_animator.stop_animation()
         self.root.destroy()
 
 
