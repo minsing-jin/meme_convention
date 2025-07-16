@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+from meme_convention.frontend.image_processor import GifProcessor, play_animated_image
 import pyperclipimg as pci
 import pyperclip
 import io
-import tempfile
 import os
+
 
 # TODO: copy gif meme image to clipboard
 class GUI:
@@ -14,7 +15,7 @@ class GUI:
         self.label = label
         self.meme_img = img
 
-        self.test_io = None
+        self.meme_io = None
 
         self.context = context
         self.get_image_func = get_image_func
@@ -24,6 +25,8 @@ class GUI:
 
     # TODO: solve the issue gif meme image copy issue not png
     def show_image(self, event=None):
+        """anmin_id is for preventing multiple animations running at the same time when user draw another meme."""
+
         # Stop previous animation if running
         if self.anim_id is not None:
             self.label.after_cancel(self.anim_id)
@@ -32,50 +35,39 @@ class GUI:
         meme = self.get_image_func(self.context)
         self.meme_img = Image.open(io.BytesIO(bytes(meme[-1])))
 
-        self.test_io = io.BytesIO(bytes(meme[-1]))
+        self.meme_io = io.BytesIO(bytes(meme[-1]))
         print(self.meme_img)
         print("bytes io: ", io.BytesIO(bytes(meme[-1])))
 
         if getattr(self.meme_img, "is_animated", False):
-            self.frames = []
-            self.durations = []
-            try:
-                while True:
-                    frame = self.meme_img.copy()
-                    self.frames.append(ImageTk.PhotoImage(frame))
-                    duration = self.meme_img.info.get('duration', 100)
-                    self.durations.append(duration)
-                    self.meme_img.seek(self.meme_img.tell() + 1)
-            except EOFError:
-                pass
-
-            self.current_frame = 0
-            self.animate_gif()
+            self.anim_id = play_animated_image(self.meme_img, self.label, self.anim_id)
         else:
             photo = ImageTk.PhotoImage(self.meme_img)
             self.label.config(image=photo)
             self.label.image = photo
 
-    def animate_gif(self):
-        frame = self.frames[self.current_frame]
-        self.label.config(image=frame)
-        self.label.image = frame
-        delay = self.durations[self.current_frame]
-        self.current_frame = (self.current_frame + 1) % len(self.frames)
-        self.anim_id = self.label.after(delay, self.animate_gif)
-
     def accept(self, event=None):
-        # TODO: gif image can't copy. So we have to generate link to copy gif.
-        pci.copy(self.meme_img)
+        try:
+            # Check if the image is animated (GIF)
+            if getattr(self.meme_img, "is_animated", False):
+                gif_processor = GifProcessor()
+                gif_processor.send_gif_to_clipboard(self.root, self.meme_io)
 
-        AutoCloseMessageBox(
-            self.root,
-            "Copied",
-            f"GIF Copied",
-            timeout=2000
-        )
-        self.root.after(2100, self.root.destroy)
-        return self.meme_img
+            else:
+                # For static images, use your existing pyperclipimg method
+                pci.copy(self.meme_img)
+
+            AutoCloseMessageBox(
+                self.root,
+                "Copied",
+                f"GIF Meme Copied" if getattr(self.meme_img, "is_animated", False) else "Image Meme Copied",
+                timeout=2000
+            )
+            self.root.after(2100, self.root.destroy)
+            return self.meme_img
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to copy: {str(e)}")
 
     def reject(self, event=None):
         self.show_image()
