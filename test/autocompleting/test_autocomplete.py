@@ -12,7 +12,7 @@ def test_gui_display_meme():
 
     # Patch the GUI class to avoid actual GUI operations
     with patch('meme_convention.autocompleting.autocomplete.GUI') as MockGUI:
-        autocomplete.gui_display_meme(mock_context)
+        autocomplete.display_meme_gui(mock_context)
 
         # Check if GUI was called with the correct parameters
         MockGUI.assert_called_once_with(
