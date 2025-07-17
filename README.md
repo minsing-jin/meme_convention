@@ -59,3 +59,7 @@ This project might be chrome extension or vscode extension or other editor exten
 - [ ] Create a meme autocomplete for all writing long form writing. This step meme can be used in many blogs, articles and other places.
 - [ ] Create a meme convention for all people. This step meme can be used in social media, forums and other places.
 - [ ] Optimize the meme autocomplete recommendation algorithm to make it more accurate and relevant user-friendly.
+- [ ] Expand the meme collection to include more diverse and inclusive memes that resonate with a wider audience.
+- [ ] Create meme community webpage where users can easily search adn upload memes in various context.
+- [ ] Expand the picture recommendation algorithm to include more diverse and inclusive images that resonate with a wider audience.
+- [ ] Create a community-driven platform where users can contribute their own memes and share them with others.

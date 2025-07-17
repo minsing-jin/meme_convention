@@ -6,7 +6,7 @@ import io
 
 class User(BASEDB):
     # TODO: I add recommendation system, implement user preferences and history tracking
-    def __init__(self, username, password):
+    def __init__(self, username=None, password=None):
         super().__init__()
         self.cursor = self.conn.cursor()
         # TODO: It will be implemented in the future
@@ -40,7 +40,6 @@ class User(BASEDB):
             self.conn.commit()
 
             print("Meme uploaded successfully!")
-            file.close()
         except psycopg2.Error as e:
             print(f"Error uploading meme: {e}")
             self.conn.rollback()
