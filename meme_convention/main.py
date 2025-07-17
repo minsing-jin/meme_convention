@@ -82,4 +82,4 @@ if __name__ == "__main__":
     # app.run()
 
     autocomplete = AutoComplete(analysis_model=None, text=None, page_image=None)
-    autocomplete.gui_display_meme("pr")
+    autocomplete.autocomplete(["pr", "issue", "bug", "feature", "task"])
