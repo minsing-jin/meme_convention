@@ -9,8 +9,8 @@ import os
 
 
 # TODO: copy gif meme image to clipboard
-class GUI:
-    def __init__(self, root, label, img, context, get_image_func):
+class MemeSelectionGUI:
+    def __init__(self, root, label, img, context, get_image_func, autocomplete_ref=None):
         self.root = root
         self.label = label
         self.meme_img = img
@@ -18,6 +18,7 @@ class GUI:
         self.meme_io = None
         self.context = context
         self.get_image_func = get_image_func
+        self.autocomplete_ref = autocomplete_ref  # Add this line
         self.gif_animator = None  # Replace anim_id with gif_animator
 
         self.show_image()
@@ -51,6 +52,10 @@ class GUI:
                 # For static images, use your existing pyperclipimg method
                 pci.copy(self.meme_img)
 
+            # Store the accepted image in autocomplete instance
+            if self.autocomplete_ref:
+                self.autocomplete_ref.accepted_image = self.meme_img
+
             AutoCloseMessageBox(
                 self.root,
                 "Copied",
@@ -59,7 +64,6 @@ class GUI:
             )
             self.root.after(2100, self.root.destroy)
             return self.meme_img
-
         except Exception as e:
             messagebox.showerror("Error", f"Failed to copy: {str(e)}")
 
