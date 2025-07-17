@@ -1,7 +1,7 @@
 from meme_convention.db.user import User
-from meme_convention.frontend.gui import *
+from meme_convention.frontend.meme_selection import *
 import tkinter as tk
-import io
+from meme_convention.frontend.context_dialog import ContextCategoryDialog
 
 
 # TODO: Add hot key condition that will trigger recommend and the autocomplete function
@@ -11,8 +11,9 @@ class AutoComplete:
         self.analysis_model = analysis_model
         self.text_context = text
         self.page_image_context = page_image
+        self.accepted_image = None
 
-    def autocomplete(self, user_choice, context_category_lst):
+    def autocomplete(self, context_category_lst):
         """
         # TODO: I have to implement the autocomplete function in the future. This issue will be implemented in issue #16.
         1. Implement the gui and autoCopy functionality for the autocomplete.
@@ -24,19 +25,26 @@ class AutoComplete:
         # context = self.classify_context_category(self.text, self.page_image)
 
         # For now, we will just return the first context category from the list
-        context = self.classify_context_category(user_choice, context_category_lst)
-        meme = self.gui_display_meme(context)
-        meme = Image.open(io.BytesIO(bytes(meme[-1])))
-        return meme
+        context = self.classify_context_category(context_category_lst)
+        accepted_image = self.display_meme_gui(context)
+        if accepted_image:
+            print("User accepted an image!")
+            print(accepted_image)
+            # Process the accepted image as needed
+            return accepted_image
+        else:
+            print("User didn't accept any image")
+            return None
 
-    def gui_display_meme(self, context):
+    def display_meme_gui(self, context):
         """GUI for displaying memes and accepting/rejecting them."""
         root = tk.Tk()
         root.title("Select your optimal meme!")
         label = tk.Label(root)
         label.pack()
 
-        gui = GUI(root, label, None, context, self.user_db.get_random_meme)
+        gui = MemeSelectionGUI(root, label, None, context, self.user_db.get_random_meme)
+        gui.autocomplete_ref = self
 
         btn_accept = tk.Button(root, text="Accept (Ctrl + c | Cmd + c)", command=gui.accept)
         btn_accept.pack(side="left", padx=10, pady=10)
@@ -47,27 +55,27 @@ class AutoComplete:
         btn_quit = tk.Button(root, text="Exit (esc)", command=gui.quit_app)
         btn_quit.pack(side="left", padx=10, pady=10)
 
-        meme = root.bind('<Control-c>', gui.accept)
-        meme = root.bind('<Command-c>', gui.accept)
+        root.bind('<Control-c>', gui.accept)
+        root.bind('<Command-c>', gui.accept)
         root.bind('<Up>', gui.reject)
         root.bind('<Down>', gui.reject)
         root.bind('<Escape>', gui.quit_app)
 
         root.mainloop()
-        return meme
 
-    # TODO: This method will be implemented after released of the first version
-    def classify_context_category(self, user_choice, context_category_lst):
-        """
-        Classify and analyze the context category based on the text and page.
-        """
-        # TODO: Autocomplete meme using text record and multimodal based on the model, extract context category in the future.
-        # context = self.analysis_model.analyze(self.text, self.page_image, context_category=context_category_lst)
-
-        # For now, we will just return the user choice if it is valid
-        user_choice = user_choice.lower()
-        if user_choice in context_category_lst:
-            return user_choice
+        if self.accepted_image:
+            return self.accepted_image
         else:
-            raise ValueError(f"Invalid context category: {user_choice}. "
-                             f"Available categories: {', '.join(context_category_lst)}")
+            print("No image accepted.")
+            return None
+
+    # TODO: In the future, this will be a multimodal and text recording classification.
+    # TODO: color doesn't work in the button.
+    def classify_context_category(self, categories: list[str]) -> str:
+        """
+        Delegates to a tiny dialog class; keeps old API/exception.
+        """
+        choice = ContextCategoryDialog.ask(categories)
+        if choice is None:
+            raise ValueError("Context category selection was cancelled by user")
+        return choice
