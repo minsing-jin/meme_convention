@@ -1,4 +1,3 @@
-# meme_convention/frontend/context_dialog.py
 from __future__ import annotations
 import tkinter as tk
 from typing import Iterable, Optional
@@ -7,7 +6,7 @@ from utils.prefix import shortest_unique_prefixes
 from utils.gui import center_window
 
 
-class ContextCategoryDialog(tk.Tk):
+class ContextCategoryDialog(tk.Toplevel):
     """
     Modal dialog that lets the user choose a category.
     Usage:
@@ -42,6 +41,7 @@ class ContextCategoryDialog(tk.Tk):
         self.result: Optional[str] = None  # set on confirm
         self._buffer: str = ""
         self._buffer_job = None
+        self._buttons: dict[str, tk.Button] = {}  # Store button references
 
         self._build_ui()
         center_window(self)
@@ -75,9 +75,16 @@ class ContextCategoryDialog(tk.Tk):
                             width=12, height=2,
                             bg="#e2e8f0", fg="black",
                             font=("Arial", 10, "bold"),
+                            relief="raised",
+                            borderwidth=2,
                             command=lambda c=cat: self._select(c))
             btn.grid(row=r, column=c, padx=5, pady=5, sticky="nsew")
             grid.columnconfigure(c, weight=1)
+            self._buttons[cat] = btn  # Store button reference
+
+        # Set initial selection
+        self._update_button_styles()
+
         # Confirm/cancel ---------------------------------------------
         bar = tk.Frame(self, bg="#1f2937")
         bar.pack(pady=(0, 15))
@@ -102,6 +109,33 @@ class ContextCategoryDialog(tk.Tk):
     # ------------------  selection logic ----------------
     def _select(self, cat: str) -> None:
         self.current.set(cat)
+        self._update_button_styles()
+
+    def _update_button_styles(self) -> None:
+        """Update button styles to highlight the selected category."""
+        current_cat = self.current.get()
+
+        for cat, btn in self._buttons.items():
+            if cat == current_cat:
+                # Selected button: thicker border, different colors
+                btn.configure(
+                    bg="#66efaf",  # Blue background
+                    fg="Green",  # Brown text
+                    relief="solid",  # Solid border style
+                    borderwidth=2,  # Thicker border
+                    highlightbackground="#66efaf",  # Blue highlight
+                    highlightthickness=2
+                )
+            else:
+                # Non-selected buttons: default style
+                btn.configure(
+                    bg="#e2e8f0",  # Light gray background
+                    fg="black",  # Black text
+                    relief="raised",  # Raised border style
+                    borderwidth=2,  # Normal border
+                    highlightbackground="#d1d5db",  # Gray highlight
+                    highlightthickness=0
+                )
 
     def _confirm(self) -> None:
         self.result = self.current.get().lower()
