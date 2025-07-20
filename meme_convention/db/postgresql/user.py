@@ -1,7 +1,5 @@
 import psycopg2
-from meme_convention.db.base import BASEDB
-from PIL import Image
-import io
+from meme_convention.db.postgresql.base import BASEDB
 
 
 class User(BASEDB):
