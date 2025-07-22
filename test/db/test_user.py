@@ -1,5 +1,5 @@
 import pytest
-from meme_convention.db.user import User
+from meme_convention.db.postgresql.user import User
 import os
 import pathlib
 import random
