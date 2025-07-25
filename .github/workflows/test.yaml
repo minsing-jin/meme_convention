@@ -34,6 +34,9 @@ jobs:
       - name: Upgrade pyOpenSSL
         run: |
           uv pip install --upgrade pyOpenSSL
+      - name: Install test dependencies
+        run: |
+          uv pip install pytest-xdist
       - name: Run tests
         run: |
           uv run python -m pytest -o log_cli=true --log-cli-level=INFO -n auto tests/
