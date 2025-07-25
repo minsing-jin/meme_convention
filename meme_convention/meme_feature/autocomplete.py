@@ -1,4 +1,3 @@
-from meme_convention.db.postgresql.user import User
 from meme_convention.frontend.meme_selection import *
 import tkinter as tk
 from meme_convention.frontend.context_dialog import ContextCategoryDialog
@@ -6,8 +5,8 @@ from meme_convention.frontend.context_dialog import ContextCategoryDialog
 
 # TODO: Add hot key condition that will trigger recommend and the autocomplete function
 class AutoComplete:
-    def __init__(self, analysis_model, text, page_image):
-        self.user_db = User()
+    def __init__(self, db, analysis_model, text, page_image):
+        self.get_image_from_db_func = db.get_random_meme
         self.analysis_model = analysis_model
         self.text_context = text
         self.page_image_context = page_image
@@ -64,7 +63,7 @@ class AutoComplete:
         label = tk.Label(self.root)
         label.pack()
 
-        gui = MemeSelectionGUI(self.root, label, None, context, self.user_db.get_random_meme)
+        gui = MemeSelectionGUI(root=self.root, label=label, img=None, context=context, get_image_func=self.get_image_from_db_func)
         gui.autocomplete_ref = self
 
         # Create buttons
