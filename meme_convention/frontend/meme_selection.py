@@ -3,22 +3,18 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 from meme_convention.frontend.image_processor import GIFProcessor, GIFAnimator
 import pyperclipimg as pci
-import pyperclip
 import io
-import os
 
 
-# TODO: copy gif meme image to clipboard
 class MemeSelectionGUI:
     def __init__(self, root, label, img, context, get_image_func, autocomplete_ref=None):
         self.root = root
         self.label = label
         self.meme_img = img
         self.meme_io = None
-        self.meme_io = None
         self.context = context
         self.get_image_func = get_image_func
-        self.autocomplete_ref = autocomplete_ref  # Add this line
+        self.autocomplete_ref = autocomplete_ref
         self.gif_animator = None  # Replace anim_id with gif_animator
 
         self.show_image()
@@ -30,8 +26,8 @@ class MemeSelectionGUI:
             self.gif_animator = None
 
         meme = self.get_image_func(self.context)
-        self.meme_img = Image.open(io.BytesIO(bytes(meme[-1])))
-        self.meme_io = io.BytesIO(bytes(meme[-1]))
+        self.meme_io = io.BytesIO(meme)
+        self.meme_img = Image.open(self.meme_io)
 
         if getattr(self.meme_img, "is_animated", False):
             # Create and start GIF animator
@@ -62,7 +58,7 @@ class MemeSelectionGUI:
                 f"GIF Meme Copied" if getattr(self.meme_img, "is_animated", False) else "Image Meme Copied",
                 timeout=2000
             )
-            self.root.after(2100, self.root.destroy)
+            self.root.after(2100, self._close_window)
             return self.meme_img
         except Exception as e:
             messagebox.showerror("Error", f"Failed to copy: {str(e)}")
@@ -70,11 +66,11 @@ class MemeSelectionGUI:
     def reject(self, event=None):
         self.show_image()
 
-    def quit_app(self, event=None):
-        # Clean up animation before closing
-        if self.gif_animator is not None:
-            self.gif_animator.stop_animation()
-        self.root.destroy()
+    def _close_window(self):
+        """Helper method to properly close the window"""
+        if self.root:
+            self.root.quit()  # Exit mainloop
+            self.root.destroy()  # Destroy window
 
 
 class AutoCloseMessageBox(tk.Toplevel):

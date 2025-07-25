@@ -1,18 +1,29 @@
 from pynput import keyboard
 import threading
+from dotenv import load_dotenv
 from utils.hotkey import MainThreadExecutor
 from meme_convention.meme_feature.autocomplete import AutoComplete
+from meme_convention.db.postgresql.postgresql import POSTGRESQL
+from meme_convention.db.local.local import LocalDB
+from meme_convention.db.get_from_web.tenor import TenorMemeProvider
+from meme_convention.db.get_from_web.giphy import GiphyMemeProvider
 
 # Create global executor instance
 executor = MainThreadExecutor()
+load_dotenv()
 
 
 def run_autocomplete_main_thread():
     """Function to run autocomplete on main thread"""
     print("Running autocomplete on main thread...")
     try:
-        autocomplete = AutoComplete(analysis_model=None, text=None, page_image=None)
-        result = autocomplete.autocomplete(["pr", "issue", "bug", "feature", "task"])
+        db = POSTGRESQL()
+        local_db = LocalDB()
+        tenor_meme_provider = TenorMemeProvider()
+        giphiy_meme_provider = GiphyMemeProvider()
+
+        autocomplete = AutoComplete(db=db,analysis_model=None, text=None, page_image=None)
+        result = autocomplete.autocomplete(["pr", "issue", "bug", "feature", "code review"])
         print(f"Autocomplete completed! Result: {result}")
     except Exception as e:
         print(f"Error: {e}")
@@ -40,7 +51,6 @@ def start_hotkey_listener_async():
     hotkey_thread.start()
     return hotkey_thread
 
-
 def main():
     """Main function that keeps the main thread active"""
     print("🚀 Starting hotkey program...")
@@ -58,4 +68,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
