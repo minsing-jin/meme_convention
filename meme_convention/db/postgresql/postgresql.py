@@ -2,7 +2,7 @@ import psycopg2
 from meme_convention.db.postgresql.base import BASEDB
 
 
-class User(BASEDB):
+class POSTGRESQL(BASEDB):
     # TODO: I add recommendation system, implement user preferences and history tracking
     def __init__(self, username=None, password=None):
         super().__init__()
@@ -19,8 +19,10 @@ class User(BASEDB):
                 "ORDER BY RANDOM() LIMIT 1;",
                 (context_category,)
             )
-            meme = self.cursor.fetchone()
-
+            meme = bytes(self.cursor.fetchone()[-1])
+            if meme is None:
+                print("No memes found for the specified context category.")
+                return None
             return meme
         except psycopg2.Error as e:
             print(f"Error retrieving random meme: {e}")
