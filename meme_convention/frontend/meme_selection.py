@@ -61,7 +61,7 @@ class MemeSelectionGUI:
                 f"GIF Meme Copied" if getattr(self.meme_img, "is_animated", False) else "Image Meme Copied",
                 timeout=2000
             )
-            self.root.after(2100, self.root.destroy)
+            self.root.after(2100, self._close_window)
             return self.meme_img
         except Exception as e:
             messagebox.showerror("Error", f"Failed to copy: {str(e)}")
@@ -69,11 +69,11 @@ class MemeSelectionGUI:
     def reject(self, event=None):
         self.show_image()
 
-    def quit_app(self, event=None):
-        # Clean up animation before closing
-        if self.gif_animator is not None:
-            self.gif_animator.stop_animation()
-        self.root.destroy()
+    def _close_window(self):
+        """Helper method to properly close the window"""
+        if self.root:
+            self.root.quit()  # Exit mainloop
+            self.root.destroy()  # Destroy window
 
 
 class AutoCloseMessageBox(tk.Toplevel):

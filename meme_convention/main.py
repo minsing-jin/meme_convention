@@ -22,7 +22,7 @@ def run_autocomplete_main_thread():
         tenor_meme_provider = TenorMemeProvider()
         giphiy_meme_provider = GiphyMemeProvider()
 
-        autocomplete = AutoComplete(db=local_db,analysis_model=None, text=None, page_image=None)
+        autocomplete = AutoComplete(db=db,analysis_model=None, text=None, page_image=None)
         result = autocomplete.autocomplete(["pr", "issue", "bug", "feature", "code review"])
         print(f"Autocomplete completed! Result: {result}")
     except Exception as e:
