@@ -3,12 +3,9 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 from meme_convention.frontend.image_processor import GIFProcessor, GIFAnimator
 import pyperclipimg as pci
-import pyperclip
 import io
-import os
 
 
-# TODO: copy gif meme image to clipboard
 class MemeSelectionGUI:
     def __init__(self, root, label, img, context, get_image_func, autocomplete_ref=None):
         self.root = root
