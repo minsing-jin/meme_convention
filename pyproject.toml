@@ -13,6 +13,7 @@ dependencies = [
     "pyperclip>=1.9.0",
     "pyperclipimg>=0.2.0",
     "pytest>=8.4.1",
+    "python-dotenv>=1.1.1",
     "requests>=2.32.4",
     "supabase>=2.16.0",
 ]
