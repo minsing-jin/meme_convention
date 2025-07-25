@@ -1,5 +1,5 @@
 import pytest
-from meme_convention.db.postgresql.user import User
+from meme_convention.db.postgresql.postgresql import POSTGRESQL
 import os
 import pathlib
 import random
@@ -10,7 +10,7 @@ root_dir = pathlib.PurePath(os.path.dirname(os.path.realpath(__file__))).parent.
 resource_dir = os.path.join(root_dir, "resources", "db_test")
 
 
-class TestUser:
+class TestPOSTGRESQL:
     test_sample_contexts_categories = ["test_pr_situation", "test_issues"]
 
     @pytest.fixture
@@ -31,7 +31,7 @@ class TestUser:
         """Setup test user and ensure test meme data is cleaned up afterward."""
 
         # --- Setup ---
-        self.user = User(username='testuser', password='testpass')
+        self.user = POSTGRESQL(username='testuser', password='testpass')
         yield  # --- Run the test ---
 
         # --- Teardown ---
