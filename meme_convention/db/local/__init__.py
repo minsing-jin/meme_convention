@@ -1,0 +1,1 @@
+from meme_convention.db.local.local import *
