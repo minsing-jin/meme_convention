@@ -15,10 +15,9 @@ class MemeSelectionGUI:
         self.label = label
         self.meme_img = img
         self.meme_io = None
-        self.meme_io = None
         self.context = context
         self.get_image_func = get_image_func
-        self.autocomplete_ref = autocomplete_ref  # Add this line
+        self.autocomplete_ref = autocomplete_ref
         self.gif_animator = None  # Replace anim_id with gif_animator
 
         self.show_image()
@@ -30,8 +29,8 @@ class MemeSelectionGUI:
             self.gif_animator = None
 
         meme = self.get_image_func(self.context)
-        self.meme_img = Image.open(io.BytesIO(bytes(meme[-1])))
-        self.meme_io = io.BytesIO(bytes(meme[-1]))
+        self.meme_io = io.BytesIO(meme)
+        self.meme_img = Image.open(self.meme_io)
 
         if getattr(self.meme_img, "is_animated", False):
             # Create and start GIF animator
