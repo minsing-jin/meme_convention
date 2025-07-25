@@ -77,4 +77,3 @@ class MusicPlayer:
             pygame.mixer.music.stop()
             self.is_playing = False
             print(f"🎵 Music stopped: {self.current_track}")
-            # 트랙 정보는 유지 (재시작할 수 있도록)
