@@ -2,11 +2,11 @@ import io
 from typing import Any
 
 from PIL import Image, ImageSequence
-from meme_convention.db.postgresql.user import User
+from meme_convention.db.postgresql.postgresql import POSTGRESQL
 
 
 def sample_image_upload(context_category, picture_name, path_to_image):
-    user = User()
+    user = POSTGRESQL()
     # # Example usage
     user.upload_meme(context_category, picture_name, path_to_image)
 
