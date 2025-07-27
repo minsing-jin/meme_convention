@@ -95,7 +95,7 @@ This project might be chrome extension or vscode extension or other editor exten
     <img src="resources/readme/dr_strange.gif" width="250">
 </p>
 
-- [ ] Create a meme(I added) convention and autocomplete for developers and researchers when they write something in github situation. (Code review, issue discussion, etc.)
+- [x] Create a meme(I added) convention and autocomplete for developers and researchers when they write something in github situation. (Code review, issue discussion, etc.)
 - [ ] Create a meme autocomplete for all developers and researchers when they write something in their code editor.
 - [ ] Check people's reaction to the meme convention and autocomplete and decided to whether continue or not.(in developer)
 - [ ] If this project is successful, release it as a chrome extension or vscode extension to expand its reach and usability.
