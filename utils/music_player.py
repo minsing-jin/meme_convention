@@ -4,7 +4,7 @@ import random
 import threading
 from pathlib import Path
 
-MUSIC_PATH = os.path.join(Path.cwd().parent, 'resources', 'music')
+MUSIC_PATH = os.path.join(Path("./").parent, 'resources', 'music')
 
 
 class MusicPlayer:

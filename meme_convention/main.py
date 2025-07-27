@@ -1,13 +1,17 @@
 from pynput import keyboard
 import threading
 from dotenv import load_dotenv
+import os, sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.hotkey import MainThreadExecutor
 from meme_convention.meme_feature.autocomplete import AutoComplete
-from meme_convention.db.postgresql.postgresql import POSTGRESQL
 from meme_convention.db.local.local import LocalDB
-from meme_convention.db.get_from_web.tenor import TenorMemeProvider
-from meme_convention.db.get_from_web.giphy import GiphyMemeProvider
 from meme_convention.meme_adder.meme_adder import MemeAdder  # Import the new meme adder
+
+# from meme_convention.db.postgresql.postgresql import POSTGRESQL
+# from meme_convention.db.get_from_web.tenor import TenorMemeProvider
+# from meme_convention.db.get_from_web.giphy import GiphyMemeProvider
 
 # Create global executor instance
 executor = MainThreadExecutor()
@@ -19,12 +23,12 @@ def run_autocomplete_main_thread():
     """Function to run autocomplete on main thread"""
     print("Running autocomplete on main thread...")
     try:
-        db = POSTGRESQL()
         local_db = LocalDB()
-        tenor_meme_provider = TenorMemeProvider()
-        giphiy_meme_provider = GiphyMemeProvider()
+        # tenor_meme_provider = TenorMemeProvider()
+        # giphiy_meme_provider = GiphyMemeProvider()
+        # db = POSTGRESQL()
 
-        autocomplete = AutoComplete(db=db, analysis_model=None, text=None, page_image=None)
+        autocomplete = AutoComplete(db=local_db, analysis_model=None, text=None, page_image=None)
         result = autocomplete.autocomplete(CONTEXTS)
         print(f"Autocomplete completed! Result: {result}")
     except Exception as e:
