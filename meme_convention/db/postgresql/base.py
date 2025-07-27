@@ -1,11 +1,17 @@
 import psycopg2
 from abc import ABC, abstractmethod
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 class BASEDB(ABC):
     """
     Base class for database models.
     This class can be extended by other models to inherit common functionality.
     """
+
     def __init__(self, **kwargs):
         """
         Initialize the base model with keyword arguments.
@@ -15,7 +21,7 @@ class BASEDB(ABC):
             self.conn = psycopg2.connect(
                 database="meme_collection",
                 user="myuser",
-                password="test",
+                password=os.environ.get("POSTGRES_PASSWORD"),
                 host="localhost",
                 port="5432"
             )

@@ -3,12 +3,12 @@ import json
 import random
 import io
 from typing import Optional
+import os
 
-API_KEY = "AIzaSyCDvNCX2zt3uDyRH9CuKClsQlubMLxCl78"
 
 class TenorMemeProvider:
     def __init__(self):
-        self.api_key = API_KEY
+        self.api_key = os.getenv("TENOR_API_KEY")
         self.client_key = "random_meme_app"
         self.base_url = "https://tenor.googleapis.com/v2"
 
