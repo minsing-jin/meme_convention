@@ -2,7 +2,7 @@ import os
 import random
 from pathlib import Path
 
-LOCALDB_PATH = os.path.join(Path.cwd().parent, 'resources', 'local_db')
+LOCALDB_PATH = os.path.join(Path("./").parent, 'resources', 'local_db')
 
 class LocalDB:
     def __init__(self):
