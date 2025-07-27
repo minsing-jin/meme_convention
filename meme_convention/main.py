@@ -7,11 +7,13 @@ from meme_convention.db.postgresql.postgresql import POSTGRESQL
 from meme_convention.db.local.local import LocalDB
 from meme_convention.db.get_from_web.tenor import TenorMemeProvider
 from meme_convention.db.get_from_web.giphy import GiphyMemeProvider
+from meme_convention.meme_adder.meme_adder import MemeAdder  # Import the new meme adder
 
 # Create global executor instance
 executor = MainThreadExecutor()
 load_dotenv()
 
+CONTEXTS = ["pr", "issue", "bug", "feature", "code review", "refactoring"]
 
 def run_autocomplete_main_thread():
     """Function to run autocomplete on main thread"""
@@ -22,27 +24,48 @@ def run_autocomplete_main_thread():
         tenor_meme_provider = TenorMemeProvider()
         giphiy_meme_provider = GiphyMemeProvider()
 
-        autocomplete = AutoComplete(db=db,analysis_model=None, text=None, page_image=None)
-        result = autocomplete.autocomplete(["pr", "issue", "bug", "feature", "code review"])
+        autocomplete = AutoComplete(db=db, analysis_model=None, text=None, page_image=None)
+        result = autocomplete.autocomplete(CONTEXTS)
         print(f"Autocomplete completed! Result: {result}")
     except Exception as e:
         print(f"Error: {e}")
 
 
+def show_meme_adder_main_thread():
+    """Function to show meme adder on main thread"""
+    print("Opening meme adder window...")
+    meme_adder = MemeAdder(CONTEXTS)
+    try:
+        meme_adder.show_meme_adder_window()
+    except Exception as e:
+        print(f"Error opening meme adder: {e}")
+
+
 def run_autocomplete():
-    """Function to run when hotkey is pressed"""
-    print("Hotkey detected! Scheduling autocomplete...")
+    """Function to run when autocomplete hotkey is pressed"""
+    print("Autocomplete hotkey detected! Scheduling autocomplete...")
     executor.add_task(run_autocomplete_main_thread)
+
+
+def show_meme_adder():
+    """Function to run when meme adder hotkey is pressed"""
+    print("Meme adder hotkey detected! Opening meme adder...")
+    executor.add_task(show_meme_adder_main_thread)
 
 
 def start_hotkey_listener_async():
     """Start hotkey listener in background thread"""
 
     def hotkey_worker():
-        print("Hotkey listener started. Press Ctrl+Shift+A to run autocomplete.")
+        print("Hotkey listener started.")
+        print("Press Ctrl+Shift+A to run autocomplete.")
+        print("Press Ctrl+Shift+M to open meme adder.")
+
         with keyboard.GlobalHotKeys({
-            '<ctrl>+<shift>+a': run_autocomplete,
-            '<cmd>+<shift>+a': run_autocomplete
+            '<ctrl>+<shift>+a': show_meme_adder,
+            '<cmd>+<shift>+a': show_meme_adder,
+            '<ctrl>+<shift>+m': run_autocomplete,
+            '<cmd>+<shift>+m': run_autocomplete
         }) as hotkeys:
             hotkeys.join()
 
@@ -50,6 +73,7 @@ def start_hotkey_listener_async():
     hotkey_thread.daemon = True
     hotkey_thread.start()
     return hotkey_thread
+
 
 def main():
     """Main function that keeps the main thread active"""
