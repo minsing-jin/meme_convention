@@ -8,8 +8,36 @@ This repository is a randomly autocomplete of meme for developers and researcher
 It is designed to make writing more engaging and fun by suggesting memes that are relevant to the content being written.
 This repository is backend of the meme convention and autocomplete for developers and researchers when they write something in specific situation.
 
+# 📖 Table of Contents
+- [👾Meme convention](#-meme-convention)
+- [⚡️ Quick Start](#quick-start)
+- [🪐 Motivation](#-motivation)
+- [🔑 Key Features](#-key-features)
+- [🤷 How to use this repository](#-how-to-use-this-repository)
+- [🤾 How to contribute](#-how-to-contribute)
+- [🚗 Roadmap](#-roadmap)
+- [📜 License](#-license)
+- [📫 Contact](#-contact)
 
-# ⚡️ Motivation
+# ⚡️ Quick Start
+1. Git clone this repository
+```bash
+git clone https://github.com/minsing-jin/meme_convention.git
+```
+
+2. Run the following command to install the required packages
+```bash
+python meme_convention/main.py
+```
+
+3. When meme convention is running, you can use the meme recommend feature and meme add feature.
+```bash
+1. meme recommend : shift + ctrl or cmd + M
+2. meme add : shift + ctrl or cmd + A 
+After that, if you drag and drop a meme image to the text area, it will be added to the local db.
+```
+
+# 🪐️ Motivation
 
 <p float="left">
   <img src="resources/readme/sleep_clap.gif" width="250" />
@@ -42,10 +70,18 @@ You can use this repository to find memes that are related to programming, softw
 You can also contribute to this repository by adding your own memes.
 
 # 🤾 How to contribute
+## Contributing categories
+1. Add a new meme to the 'local db' directory
+2. Fix a bug in the meme recommendation algorithm
+3. Improve the user interface of the meme convention
+
+## How to contribute
 1. Fork this repository
-2. Create a new branch
-3. Add your meme to the `memes` directory
-4. Commit your changes
+2. Create a new issue for your contribution
+   - If you want to add a new meme, please include the meme image and a brief description of the meme.
+   - If you want to fix a bug or improve the user interface, please include a description of the bug or improvement.
+3. Create a new branch `Feature/#issue_number`
+4. Create pull request your changes
 
 # 🚗 Roadmap
 This project might be chrome extension or vscode extension or other editor extension.(not discussed yet)
@@ -66,3 +102,9 @@ This project might be chrome extension or vscode extension or other editor exten
 - [ ] Create meme community webpage where users can easily search adn upload memes in various context.
 - [ ] Expand the picture recommendation algorithm to include more diverse and inclusive images that resonate with a wider audience.
 - [ ] Create a community-driven platform where users can contribute their own memes and share them with others.
+
+# 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+# 📫 Contact
+If you have any questions or suggestions, feel free to contact me at [email](mailto:developermisning@gmail.com)
