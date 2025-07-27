@@ -58,7 +58,8 @@ In the future, I plan to expand my project into a general platform where anyone 
 
 # 🔑 Key Features
 1. Recommendation algorithm that suggests memes based on the context of the writing.
-2. user can add their own memes to the repository using their mouse right click.
+2. User can add their own memes to the local database.
+3. We can use the meme convention using the keyboard shortcut `shift + ctrl or cmd + M` to recommend memes and `shift + ctrl or cmd + A` to add memes.
 
 - When developers write content, the meme convention can autocomplete memes based on contextual rules(It will be automated using recommendation algorithm later), making their writing more engaging and fun.
 - A collection of memes related to programming and software development
