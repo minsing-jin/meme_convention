@@ -9,6 +9,7 @@ dependencies = [
     "keyboard>=0.13.5",
     "pillow>=11.3.0",
     "psycopg2-binary>=2.9.10",
+    "pygame>=2.6.1",
     "pynput>=1.8.1",
     "pyperclip>=1.9.0",
     "pyperclipimg>=0.2.0",
@@ -17,4 +18,5 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "requests>=2.32.4",
     "supabase>=2.16.0",
+    "tkinterdnd2>=0.4.3",
 ]

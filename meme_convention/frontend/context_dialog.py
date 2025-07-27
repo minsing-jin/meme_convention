@@ -19,7 +19,7 @@ class ContextCategoryDialog(tk.Toplevel):
 
     # Class-level music player and settings
     _music_player = None
-    _music_enabled = False
+    _music_enabled = True
 
     # ----------------------------------------------------
     # Public API
