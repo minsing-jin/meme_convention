@@ -56,7 +56,7 @@ After that, if you drag and drop a meme image to the text area, it will be added
   <img src="resources/readme/koojacheol_why.gif" width="280" />
 </p>
 
-1. Many developer and researcher write in many situations. But I think that their writing is not engaging and fun.
+1. Many developer and researcher write in many situations. But their writing is not engaging and fun.
 2. In code reviews or issue discussions, plain text can come off as cold—like a robot wrote it—and might accidentally hurt someone's feelings or spark misunderstandings.
 3. I believe that memes can help to make writing more engaging and fun, and can also help to clarify(???) the meaning of the text.
 
