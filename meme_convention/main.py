@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.hotkey import MainThreadExecutor
 from meme_convention.meme_feature.autocomplete import AutoComplete
 from meme_convention.db.local.local import LocalDB
-from meme_convention.meme_adder.meme_adder import MemeAdder  # Import the new meme adder
+from meme_convention.setting.meme_adder import MemeAdder  # Import the new meme adder
 
 # from meme_convention.db.postgresql.postgresql import POSTGRESQL
 # from meme_convention.db.get_from_web.tenor import TenorMemeProvider
