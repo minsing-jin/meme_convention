@@ -1,3 +1,4 @@
+# TODO: define context definition and improve the prompt to know ai better about the context
 def context_injection_prompt(
         provided_context_list: list[str],
         typing_record: str):
@@ -11,9 +12,10 @@ def context_injection_prompt(
     2. User screenshots.
     Select the most relevant context category from the provided context list.
     
-    Please provide your answer in the following format:""" + """
-    ```{
-    output: <selected_context_category>
+    Please response only in json format:""" + """
+    ```json
+    {
+        output: <selected_context_category>
     }
     ```
     """
