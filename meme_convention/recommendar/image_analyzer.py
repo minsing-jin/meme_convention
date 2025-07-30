@@ -1,5 +1,5 @@
 import os
-import base64
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -8,15 +8,14 @@ load_dotenv()
 # Initialize the OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # Or pass directly: OpenAI(api_key="your-api-key")
 
-
-def analyze_context_with_gpt(image, model: str, prompt_text: dict):
+def analyze_context_with_gpt(image, prompt_text: dict, model: str = "gpt-4o-mini") -> str:
     response = client.chat.completions.create(
         model=model,
         messages=[
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": prompt_text['user']},
+                    {"type": "text", "text": prompt_text},
                     {
                         "type": "image_url",
                         "image_url": {
@@ -26,6 +25,11 @@ def analyze_context_with_gpt(image, model: str, prompt_text: dict):
                 ]
             }
         ],
-        max_tokens=300  # Adjust as needed
+        max_tokens=300,  # Adjust as needed
+        response_format={"type": "json_object"}
     )
-    return response.choices[0].message.content
+    context = json.loads(response.choices[0].message.content)['output']
+
+    print(prompt_text)
+
+    return context
