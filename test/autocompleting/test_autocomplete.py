@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 from PIL import Image
-from meme_convention.meme_feature.autocomplete import AutoComplete  # Replace with your actual module path
+from meme_convention.autocomplete.autocomplete import AutoComplete  # Replace with your actual module path
 from meme_convention.db.postgresql.postgresql import POSTGRESQL
 
 def test_gui_display_meme():
