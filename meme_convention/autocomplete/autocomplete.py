@@ -25,7 +25,7 @@ class AutoComplete:
         """
 
         # TODO: Analyze the text and image to determine the context category
-        # context = self.classify_context_category(self.text, self.page_image)
+        context = self.classify_context_category(self.text, self.page_image)
 
         # For now, we will just return the first context category from the list
         try:
