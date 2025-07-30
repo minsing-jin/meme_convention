@@ -1,13 +1,15 @@
 from pynput import keyboard
+from pynput.keyboard import Key
 import threading
 from dotenv import load_dotenv
 import os, sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.hotkey import MainThreadExecutor
-from meme_convention.meme_feature.autocomplete import AutoComplete
+from meme_convention.autocomplete.autocomplete import AutoComplete
 from meme_convention.db.local.local import LocalDB
 from meme_convention.setting.meme_adder import MemeAdder  # Import the new meme adder
+from meme_convention.recommendar.text_recorder import TypingRecorder
 
 # from meme_convention.db.postgresql.postgresql import POSTGRESQL
 # from meme_convention.db.get_from_web.tenor import TenorMemeProvider
@@ -15,8 +17,11 @@ from meme_convention.setting.meme_adder import MemeAdder  # Import the new meme 
 
 # Create global executor instance
 executor = MainThreadExecutor()
+typing_recorder = TypingRecorder()
 load_dotenv()
 
+# TODO: We have to bring context categories at specific directory and read context folders names
+# TODO: Convert data type to dictionary {context: description}
 CONTEXTS = ["pr", "issue", "bug", "feature", "code review", "refactoring"]
 
 def run_autocomplete_main_thread():
@@ -28,7 +33,7 @@ def run_autocomplete_main_thread():
         # giphiy_meme_provider = GiphyMemeProvider()
         # db = POSTGRESQL()
 
-        autocomplete = AutoComplete(db=local_db, analysis_model=None, text=None, page_image=None)
+        autocomplete = AutoComplete(db=local_db, typing_recorder=typing_recorder)
         result = autocomplete.autocomplete(CONTEXTS)
         print(f"Autocomplete completed! Result: {result}")
     except Exception as e:
@@ -78,10 +83,32 @@ def start_hotkey_listener_async():
     hotkey_thread.start()
     return hotkey_thread
 
+def on_press(key):
+    try:
+        if hasattr(key, 'char') and key.char is not None:
+            typing_recorder.record(key.char)
+        else:
+            # Handle special keys explicitly
+            if key == Key.space:
+                typing_recorder.record(' ')
+            elif key == Key.enter:
+                # Record newline
+                typing_recorder.record('\n')
+            elif key == Key.tab:
+                typing_recorder.record('\t')
+            elif key == Key.backspace:
+                # Remove the last character if present (simulate backspace)
+                typing_recorder.backspace()
+            # You can add more keys here if needed
+    except Exception:
+        pass
 
 def main():
-    """Main function that keeps the main thread active"""
     print("🚀 Starting hotkey program...")
+
+    # Start the keyboard listener to record typing
+    listener = keyboard.Listener(on_press=on_press)
+    listener.start()
 
     # Start hotkey listener in background
     start_hotkey_listener_async()
