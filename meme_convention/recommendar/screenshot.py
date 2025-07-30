@@ -13,6 +13,9 @@ def take_screenshot():
     """
     try:
         screenshot = pyautogui.screenshot()
+        # TODO: This is for testing purposes, remove later
+        screenshot.show()
+
         buffered = BytesIO()
         screenshot.save(buffered, format="PNG")
         base64_image = base64.b64encode(buffered.getvalue()).decode()
