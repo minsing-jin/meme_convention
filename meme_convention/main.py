@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os, sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from utils.hotkey import MainThreadExecutor
+from meme_convention.setting.hotkey import MainThreadExecutor
 from meme_convention.autocomplete.autocomplete import AutoComplete
 from meme_convention.db.local.local import LocalDB
 from meme_convention.setting.meme_adder import MemeAdder  # Import the new meme adder

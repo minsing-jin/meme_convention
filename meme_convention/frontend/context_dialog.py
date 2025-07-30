@@ -2,7 +2,7 @@ from __future__ import annotations
 import tkinter as tk
 from typing import Iterable, Optional
 
-from utils.music_player import MusicPlayer
+from meme_convention.setting.music_player import MusicPlayer
 from utils.prefix import shortest_unique_prefixes
 from utils.gui import center_window
 
