@@ -1,35 +1,33 @@
 from meme_convention.frontend.meme_selection import *
 import tkinter as tk
 from meme_convention.frontend.context_dialog import ContextCategoryDialog
+from meme_convention.recommendar.recommender import classify_context_category
+from meme_convention.recommendar.text_recorder import TypingRecorder
 
 
 # TODO: Add hot key condition that will trigger recommend and the autocomplete function
+# TODO: Have to consider whether model is instance or string model name.
 class AutoComplete:
-    def __init__(self, db, analysis_model, text, page_image):
+    def __init__(self, db, typing_recorder: TypingRecorder, analysis_model="gpt-4o-mini"):
         self.get_image_from_db_func = db.get_random_meme
         self.analysis_model = analysis_model
-        self.text_context = text
-        self.page_image_context = page_image
         self.accepted_image = None
         self.root = None
 
+        self.typing_recorder = typing_recorder
         self.music_player = None
         self.music_enabled = False
 
     def autocomplete(self, context_category_lst):
         """
-        # TODO: I have to implement the autocomplete function in the future. This issue will be implemented in issue #16.
         1. Implement the gui and autoCopy functionality for the autocomplete.
         2. Autocomplete the multimodal based on the model and context category in the future.
         3. Autocomplete in user's text box and page image context.
         """
 
-        # TODO: Analyze the text and image to determine the context category
-        context = self.classify_context_category(self.text, self.page_image)
-
-        # For now, we will just return the first context category from the list
         try:
-            context = self.classify_context_category(context_category_lst)
+            context = classify_context_category(context_category_lst, self.typing_recorder, model=self.analysis_model)
+            print(f"Context category selected: {context}")
             self.music_player = ContextCategoryDialog._music_player
 
             if ContextCategoryDialog.get_music_enabled():
@@ -162,28 +160,3 @@ class AutoComplete:
             self.root.quit()  # Exit mainloop
             self.root.destroy()  # Destroy window
             self.root = None
-
-    def classify_context_category(self, categories: list[str]) -> str:
-        """Context category classification with better error handling"""
-        print(f"🔍 Attempting to classify context with categories: {categories}")
-
-        try:
-            # Add debug info about threading context
-            import threading
-            current_thread = threading.current_thread()
-            is_main_thread = current_thread is threading.main_thread()
-            print(f"📍 Running on {'main' if is_main_thread else 'background'} thread: {current_thread.name}")
-
-            choice = ContextCategoryDialog.ask(categories)
-            print(f"✅ User selected: {choice}")
-
-            if choice is None:
-                print("❌ User cancelled context category selection")
-                raise ValueError("Context category selection was cancelled by user")
-
-            return choice
-
-        except Exception as e:
-            print(f"💥 Error in classify_context_category: {e}")
-            print(f"📋 Available categories were: {categories}")
-            raise
