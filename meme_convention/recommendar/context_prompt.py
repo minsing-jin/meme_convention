@@ -1,5 +1,5 @@
 # TODO: define context definition and improve the prompt to know ai better about the context
-def context_injection_prompt(
+def create_prompt_based_on_text(
         provided_context_list: list[str],
         typing_record: str):
     return f"""
