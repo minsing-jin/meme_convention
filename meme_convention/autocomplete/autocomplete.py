@@ -1,43 +1,67 @@
-from meme_convention.frontend.meme_selection import *
+from pathlib import Path
 import tkinter as tk
-from meme_convention.frontend.context_dialog import ContextCategoryDialog
+import os
+
+from meme_convention.setting.setting_configuration import SystemSettingsConfiguration
 from meme_convention.recommendar.recommender import classify_context_category
 from meme_convention.recommendar.text_recorder import TypingRecorder
+from meme_convention.setting.music_player import MusicPlayer
+from meme_convention.frontend.meme_selection import *
+
+CONTEXT_CATEGORY_PATH = os.path.join(Path(__file__).parent.parent.parent, 'resources', 'local_db')
 
 
 # TODO: Add hot key condition that will trigger recommend and the autocomplete function
 # TODO: Have to consider whether model is instance or string model name.
+# TODO: 할것들: system_setting을 pydantic으로 받고 setting값으로 각각 받기
+#  , context_category_dialog 인스턴스 받기
 class AutoComplete:
-    def __init__(self, db, typing_recorder: TypingRecorder, analysis_model="gpt-4o-mini"):
+    # In your AutoComplete.__init__ method, modify:
+    def __init__(self, db,
+                 typing_recorder: TypingRecorder,
+                 system_settings: SystemSettingsConfiguration,
+                 analysis_model="gpt-4o-mini",
+                 ):
         self.get_image_from_db_func = db.get_random_meme
         self.analysis_model = analysis_model
         self.accepted_image = None
         self.root = None
 
         self.typing_recorder = typing_recorder
-        self.music_player = None
-        self.music_enabled = False
+        self.system_settings = system_settings
+        self.music_enabled = system_settings.get_settings().music_enabled
 
-    def autocomplete(self, context_category_lst):
+        # Initialize music player only if enabled
+        if self.music_enabled:
+            self.music_player = MusicPlayer()
+            # Start music immediately when autocomplete starts
+            if not self.music_player.play_random_music():
+                print("❌ Failed to start music, disabling music feature")
+                self.music_enabled = False
+        else:
+            self.music_player = None
+
+    def autocomplete(self):
         """
         1. Implement the gui and autoCopy functionality for the autocomplete.
         2. Autocomplete the multimodal based on the model and context category in the future.
         3. Autocomplete in user's text box and page image context.
         """
-
+        context_category_lst = [name for name in os.listdir(CONTEXT_CATEGORY_PATH) if os.path.isdir(os.path.join(CONTEXT_CATEGORY_PATH, name))]
         try:
-            context = classify_context_category(context_category_lst, self.typing_recorder, model=self.analysis_model)
+            context = classify_context_category(context_category_lst,
+                                                self.system_settings.get_settings().allow_screenshot,
+                                                self.typing_recorder,
+                                                model=self.analysis_model)
             print(f"Context category selected: {context}")
-            self.music_player = ContextCategoryDialog._music_player
 
-            if ContextCategoryDialog.get_music_enabled():
-                self.music_enabled = True
-                if self.music_player:
-                    success = self.music_player.ensure_music_playing()
-                    if success:
-                        print("🎵 Same music continues in meme selection")
-                    else:
-                        print("🎵 Music playback issue detected")
+            # Check if music player is initialized
+            if self.music_enabled:
+                success = self.music_player.ensure_music_playing()
+                if success:
+                    print("🎵 Same music continues in meme selection")
+                else:
+                    print("🎵 Music playback issue detected")
 
             accepted_image = self.display_meme_gui(context)
 
@@ -68,7 +92,7 @@ class AutoComplete:
 
         self.root = tk.Toplevel()
 
-        if self.music_enabled and self.music_player and self.music_player.is_playing:
+        if self.music_enabled and self.music_player:
             current_song = self.music_player.current_track or "Unknown"
             self.root.title(f"Select your meme! 🎵 {current_song}")
             # 음악 연속성 한 번 더 확인
@@ -80,7 +104,7 @@ class AutoComplete:
         self.root.attributes('-topmost', True)
         self.root.focus_force()
 
-        if self.music_enabled and self.music_player and self.music_player.is_playing:
+        if self.music_enabled and self.music_player:
             music_frame = tk.Frame(self.root, bg="#f0f0f0")
             music_frame.pack(fill="x", pady=(0, 10))
 
