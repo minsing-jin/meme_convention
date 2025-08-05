@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from meme_convention.setting.hotkey import MainThreadExecutor
 from meme_convention.autocomplete.autocomplete import AutoComplete, CONTEXT_CATEGORY_PATH
 from meme_convention.db.local.local import LocalDB
-from meme_convention.setting.system_setting_gui import SystemSettingsGUI
+from meme_convention.setting.meme_adder import MemeAdder  # Replace with actual import path if different
 from meme_convention.recommendar.text_recorder import TypingRecorder
 from utils.utils import load_yaml_file
 
@@ -19,7 +19,7 @@ typing_recorder = TypingRecorder()
 load_dotenv()
 
 # Global instances
-system_setting_gui_instance = None
+meme_adder_instance = None
 keyboard_listener = None
 config_file_path = 'setting_config.yaml'
 
@@ -73,14 +73,14 @@ def save_settings(settings_data):
 
 
 def initialize_instances():
-    """Initialize SystemSettingsGUI instance"""
-    global system_setting_gui_instance
-    if system_setting_gui_instance is None:
+    """Initialize MemeAdder instance"""
+    global meme_adder_instance
+    if meme_adder_instance is None:
         # Ensure configuration file exists
         initialize_settings_config()
 
-        system_setting_gui_instance = SystemSettingsGUI(
-            yaml_file_path=config_file_path,
+        # Assuming MemeAdder takes similar parameters; adjust based on actual class definition
+        meme_adder_instance = MemeAdder(
             contexts=[name for name in os.listdir(CONTEXT_CATEGORY_PATH)]
         )
 
@@ -95,7 +95,6 @@ def run_autocomplete_main_thread():
         autocomplete_instance = AutoComplete(
             db=local_db,
             typing_recorder=typing_recorder,
-            config_data=config_data
         )
 
         result = autocomplete_instance.autocomplete()
@@ -104,14 +103,14 @@ def run_autocomplete_main_thread():
         print(f"Error in autocomplete: {e}")
 
 
-def show_system_settings_main_thread():
-    """Function to show system settings on main thread"""
-    print("Opening system settings window...")
+def show_meme_adder_main_thread():
+    """Function to show meme adder on main thread"""
+    print("Opening meme adder window...")
     try:
         initialize_instances()
-        system_setting_gui_instance.run()
+        meme_adder_instance.show_meme_adder_window()  # Assuming MemeAdder has a run() method; adjust if needed
     except Exception as e:
-        print(f"Error opening system settings: {e}")
+        print(f"Error opening meme adder: {e}")
 
 
 def run_autocomplete():
@@ -120,10 +119,10 @@ def run_autocomplete():
     executor.add_task(run_autocomplete_main_thread)
 
 
-def show_system_settings():
-    """Function to run when system settings hotkey is pressed"""
-    print("System settings hotkey detected! Opening system settings...")
-    executor.add_task(show_system_settings_main_thread)
+def show_meme_adder():
+    """Function to run when meme adder hotkey is pressed"""
+    print("Meme adder hotkey detected! Opening meme adder...")
+    executor.add_task(show_meme_adder_main_thread)
 
 
 def start_hotkey_listener_async():
@@ -139,12 +138,12 @@ def start_hotkey_listener_async():
             print("Warning: No hotkey configured, using default")
             settings_hotkey = '<ctrl>+<shift>+a'
 
-        print(f"Using settings hotkey: {settings_hotkey}")
+        print(f"Using meme adder hotkey: {settings_hotkey}")
 
         try:
             with keyboard.GlobalHotKeys({
-                settings_hotkey: show_system_settings,
-                '<cmd>+<shift>+a': show_system_settings,
+                settings_hotkey: show_meme_adder,
+                '<cmd>+<shift>+a': show_meme_adder,
                 '<ctrl>+<shift>+m': run_autocomplete,
                 '<cmd>+<shift>+m': run_autocomplete
             }) as hotkeys:
@@ -154,8 +153,8 @@ def start_hotkey_listener_async():
             print(f"Problematic hotkey: {settings_hotkey}")
             # Use fallback hotkeys only
             with keyboard.GlobalHotKeys({
-                '<ctrl>+<shift>+a': show_system_settings,
-                '<cmd>+<shift>+a': show_system_settings,
+                '<ctrl>+<shift>+a': show_meme_adder,
+                '<cmd>+<shift>+a': show_meme_adder,
                 '<ctrl>+<shift>+m': run_autocomplete,
                 '<cmd>+<shift>+m': run_autocomplete
             }) as hotkeys:
