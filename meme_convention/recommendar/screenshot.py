@@ -1,4 +1,3 @@
-# TODO: screenshot functionality when user press shortcuts
 from io import BytesIO
 import pyautogui
 import base64

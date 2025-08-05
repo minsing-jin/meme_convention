@@ -1,124 +1,257 @@
-from pynput import keyboard
-from pynput.keyboard import Key
 import threading
-from dotenv import load_dotenv
 import os, sys
+import yaml
+from pynput import keyboard
+from pynput.keyboard import Key, KeyCode
+from dotenv import load_dotenv
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from utils.hotkey import MainThreadExecutor
-from meme_convention.autocomplete.autocomplete import AutoComplete
+from meme_convention.setting.hotkey import MainThreadExecutor
+from meme_convention.autocomplete.autocomplete import AutoComplete, CONTEXT_CATEGORY_PATH
 from meme_convention.db.local.local import LocalDB
-from meme_convention.setting.meme_adder import MemeAdder  # Import the new meme adder
+from meme_convention.setting.meme_adder import MemeAdder
 from meme_convention.recommendar.text_recorder import TypingRecorder
 
-# from meme_convention.db.postgresql.postgresql import POSTGRESQL
-# from meme_convention.db.get_from_web.tenor import TenorMemeProvider
-# from meme_convention.db.get_from_web.giphy import GiphyMemeProvider
-
-# Create global executor instance
 executor = MainThreadExecutor()
 typing_recorder = TypingRecorder()
 load_dotenv()
 
-# TODO: We have to bring context categories at specific directory and read context folders names
-# TODO: Convert data type to dictionary {context: description}
-CONTEXTS = ["pr", "issue", "bug", "feature", "code review", "refactoring"]
+meme_adder_instance = None
+keyboard_listener = None
+config_file_path = 'setting_config.yaml'
+
+
+def initialize_settings_config():
+    if not os.path.exists(config_file_path):
+        config_data = {
+            'music_enabled': False,
+            'keyboard_recording': False,
+            'allow_screenshot': False,
+            'context_category': [],
+            'user_info': {'Age': '', 'Interest': '', 'Country': '', 'Location': '', 'Job': ''},
+            'hot_key': '<ctrl>+<shift>+a'
+        }
+        with open(config_file_path, 'w', encoding='utf-8') as f:
+            yaml.dump(config_data, f, default_flow_style=False, allow_unicode=True)
+        print(f"Created configuration file: {config_file_path}")
+    return config_file_path
+
+
+def load_settings():
+    try:
+        with open(config_file_path, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f) or {}
+    except yaml.YAMLError as e:
+        print(f"[YAML ERROR] Failed to parse settings: {e}")
+        return {}
+    except Exception as e:
+        print(f"[LOAD ERROR] Failed to load settings: {e}")
+        return {}
+
+
+def save_settings(settings_data):
+    try:
+        with open(config_file_path, 'w', encoding='utf-8') as f:
+            yaml.dump(settings_data, f, default_flow_style=False, allow_unicode=True)
+        print(f"Settings saved to {config_file_path}")
+    except Exception as e:
+        print(f"Failed to save settings: {e}")
+
+
+def initialize_instances():
+    global meme_adder_instance
+    if meme_adder_instance is None:
+        initialize_settings_config()
+        meme_adder_instance = MemeAdder(contexts=[name for name in os.listdir(CONTEXT_CATEGORY_PATH)])
+
 
 def run_autocomplete_main_thread():
-    """Function to run autocomplete on main thread"""
     print("Running autocomplete on main thread...")
     try:
         local_db = LocalDB()
-        # tenor_meme_provider = TenorMemeProvider()
-        # giphiy_meme_provider = GiphyMemeProvider()
-        # db = POSTGRESQL()
-
-        autocomplete = AutoComplete(db=local_db, typing_recorder=typing_recorder)
-        result = autocomplete.autocomplete(CONTEXTS)
+        autocomplete_instance = AutoComplete(db=local_db, typing_recorder=typing_recorder)
+        result = autocomplete_instance.autocomplete()
         print(f"Autocomplete completed! Result: {result}")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error in autocomplete: {e}")
 
 
 def show_meme_adder_main_thread():
-    """Function to show meme adder on main thread"""
     print("Opening meme adder window...")
-    meme_adder = MemeAdder(CONTEXTS)
     try:
-        meme_adder.show_meme_adder_window()
+        initialize_instances()
+        meme_adder_instance.show_meme_adder_window()
     except Exception as e:
         print(f"Error opening meme adder: {e}")
 
 
 def run_autocomplete():
-    """Function to run when autocomplete hotkey is pressed"""
     print("Autocomplete hotkey detected! Scheduling autocomplete...")
     executor.add_task(run_autocomplete_main_thread)
 
 
 def show_meme_adder():
-    """Function to run when meme adder hotkey is pressed"""
     print("Meme adder hotkey detected! Opening meme adder...")
     executor.add_task(show_meme_adder_main_thread)
 
 
-def start_hotkey_listener_async():
-    """Start hotkey listener in background thread"""
+current_keys = set()
 
-    def hotkey_worker():
-        print("Hotkey listener started.")
-        print("Press Ctrl+Shift+A to run autocomplete.")
-        print("Press Ctrl+Shift+M to open meme adder.")
+HOTKEYS = {}
 
-        with keyboard.GlobalHotKeys({
-            '<ctrl>+<shift>+a': show_meme_adder,
-            '<cmd>+<shift>+a': show_meme_adder,
-            '<ctrl>+<shift>+m': run_autocomplete,
-            '<cmd>+<shift>+m': run_autocomplete
-        }) as hotkeys:
-            hotkeys.join()
 
-    hotkey_thread = threading.Thread(target=hotkey_worker)
-    hotkey_thread.daemon = True
-    hotkey_thread.start()
-    return hotkey_thread
+def parse_hotkey(hotkey_str):
+    """'<ctrl>+<shift>+a' 형식의 문자열을 pynput 키 객체의 집합으로 변환"""
+    parts = hotkey_str.lower().replace(' ', '').split('+')
+    keys = set()
+    for part in parts:
+        if part.startswith('<') and part.endswith('>'):
+            key_name = part[1:-1]
+            if key_name.startswith('cmd'): key_name = 'cmd_l'  # macOS 호환성
+            try:
+                keys.add(getattr(Key, key_name))
+            except AttributeError:
+                print(f"Warning: Unknown special key '{key_name}' in hotkey '{hotkey_str}'")
+        elif len(part) == 1:
+            keys.add(KeyCode(char=part))
+    return frozenset(keys)  # 변경 불가능한 set으로 반환
+
+
+def update_hotkeys():
+    """설정 파일에서 단축키를 읽어와 HOTKEYS 딕셔너리를 업데이트"""
+    global HOTKEYS
+    current_settings = load_settings()
+    settings_hotkey_str = current_settings.get('hot_key', '<ctrl>+<shift>+a')
+
+    # 설정 파일의 단축키
+    settings_hotkey = parse_hotkey(settings_hotkey_str)
+
+    # 고정 단축키
+    autocomplete_hotkey_ctrl = parse_hotkey('<ctrl>+<shift>+m')
+    autocomplete_hotkey_cmd = parse_hotkey('<cmd>+<shift>+m')
+
+    HOTKEYS = {
+        settings_hotkey: show_meme_adder,
+        parse_hotkey('<cmd>+<shift>+a'): show_meme_adder,  # macOS용 대체
+        autocomplete_hotkey_ctrl: run_autocomplete,
+        autocomplete_hotkey_cmd: run_autocomplete,
+    }
+    print(f"Hotkeys updated. Meme Adder: {settings_hotkey_str}, Autocomplete: <ctrl/cmd>+<shift>+m")
+
 
 def on_press(key):
+    """키가 눌렸을 때 호출되는 함수"""
+    # 1. 단축키 확인
+    # frozenset은 순서가 없으므로 frozenset(current_keys)으로 비교하면 안됨
+    # frozenset을 포함하는지 확인해야 함
+    for hotkey, function in HOTKEYS.items():
+        if key in hotkey and hotkey.issubset(current_keys.union({key})):
+            function()
+    current_keys.add(key)
+
+    if key in [Key.f12, Key.f1, Key.f2, Key.f11,
+               Key.media_volume_up, Key.media_volume_down, Key.media_volume_mute,
+               Key.ctrl, Key.ctrl_l, Key.ctrl_r, Key.shift, Key.shift_l, Key.shift_r,
+               Key.alt, Key.alt_l, Key.alt_r, Key.cmd, Key.cmd_l, Key.cmd_r]:
+        return
+
     try:
+        current_settings = load_settings()
+        if not current_settings.get('keyboard_recording', False):
+            return
+
         if hasattr(key, 'char') and key.char is not None:
             typing_recorder.record(key.char)
         else:
-            # Handle special keys explicitly
-            if key == Key.space:
-                typing_recorder.record(' ')
-            elif key == Key.enter:
-                # Record newline
-                typing_recorder.record('\n')
-            elif key == Key.tab:
-                typing_recorder.record('\t')
+            special_key_map = {
+                Key.space: ' ',
+                Key.enter: '\n',
+                Key.tab: '\t',
+            }
+            if key in special_key_map:
+                typing_recorder.record(special_key_map[key])
             elif key == Key.backspace:
-                # Remove the last character if present (simulate backspace)
                 typing_recorder.backspace()
-            # You can add more keys here if needed
-    except Exception:
+    except Exception as e:
+        print(f"Error in on_press logging: {e}")  # 디버깅을 위해 에러 출력
+
+
+def on_release(key):
+    """키에서 손을 뗐을 때 호출되는 함수"""
+    try:
+        current_keys.remove(key)
+    except KeyError:
         pass
 
+
+def start_keyboard_listener():
+    """키보드 리스너를 시작하거나 재시작하는 통합 함수"""
+    global keyboard_listener
+
+    # 기존 리스너가 있다면 중지
+    if keyboard_listener:
+        try:
+            keyboard_listener.stop()
+            keyboard_listener.join(timeout=1.0)
+            if keyboard_listener.is_alive():
+                print("Warning: Keyboard listener did not stop gracefully.")
+        except Exception as e:
+            print(f"Error stopping keyboard listener: {e}")
+        finally:
+            keyboard_listener = None
+
+    print("Starting unified keyboard listener...")
+    update_hotkeys()  # 리스너 시작 전 최신 단축키 정보 로드
+
+    keyboard_listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+    keyboard_listener.start()
+
+
+def monitor_settings_changes():
+    last_modified = 0
+
+    def check_file_changes():
+        nonlocal last_modified
+        try:
+            if os.path.exists(config_file_path):
+                current_modified = os.path.getmtime(config_file_path)
+                if current_modified != last_modified:
+                    last_modified = current_modified
+                    print("Settings file changed, restarting keyboard listener to apply changes...")
+                    # 리스너 재시작 시 단축키 설정도 다시 로드됨
+                    start_keyboard_listener()
+        except Exception as e:
+            print(f"Error monitoring settings: {e}")
+
+    def monitor_worker():
+        import time
+        while True:
+            check_file_changes()
+            time.sleep(2)
+
+    monitor_thread = threading.Thread(target=monitor_worker, daemon=True)
+    monitor_thread.start()
+
+
 def main():
-    print("🚀 Starting hotkey program...")
+    print("🚀 Starting program with unified listener...")
 
-    # Start the keyboard listener to record typing
-    listener = keyboard.Listener(on_press=on_press)
-    listener.start()
+    initialize_settings_config()
 
-    # Start hotkey listener in background
-    start_hotkey_listener_async()
+    # 통합 리스너 시작 (이 안에서 hotkey 설정도 로드합니다)
+    start_keyboard_listener()
 
-    # Run the main GUI loop
+    # 설정 파일 변경 감지 시작
+    monitor_settings_changes()
+
     try:
+        print("System ready! Press configured hotkeys to interact.")
         executor.run_main_loop()
     except KeyboardInterrupt:
         print("\nProgram terminated.")
         executor.running = False
+        if keyboard_listener:
+            keyboard_listener.stop()
 
 
 if __name__ == "__main__":

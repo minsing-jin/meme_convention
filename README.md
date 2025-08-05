@@ -1,5 +1,4 @@
-
-# 👾Meme convention
+# 👾 Meme convention
 
 > _"Needed explaining, That humor flopped."_  
 >  — Youtuber Shuka World-
@@ -40,8 +39,8 @@ uv run ./meme_convention/main.py
 
 4. When meme convention is running, you can use the meme recommend feature and meme add feature.
 ```bash
-1. meme recommend : shift + ctrl or cmd + M
-2. meme add : shift + ctrl or cmd + A 
+1. meme recommend : shift + ctrl + M
+2. meme add : shift + ctrl + A 
 After that, if you drag and drop a meme image to the text area, it will be added to the local db.
 ```
 
@@ -100,8 +99,6 @@ This project might be chrome extension or vscode extension or other editor exten
 </p>
 
 - [x] Create a meme(I added) convention and autocomplete for developers and researchers when they write something in github situation. (Code review, issue discussion, etc.)
-- [ ] Create a meme autocomplete for all developers and researchers when they write something in their code editor.
-- [ ] Check people's reaction to the meme convention and autocomplete and decided to whether continue or not.(in developer)
 - [ ] If this project is successful, release it as a chrome extension or vscode extension to expand its reach and usability.
 - [ ] Add many genre of meme such as sports, movies, game, animation.... to make sympathize with more people.
 - [ ] Create a meme autocomplete for all writing long form writing. This step meme can be used in many blogs, articles and other places.

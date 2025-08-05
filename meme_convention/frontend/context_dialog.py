@@ -2,14 +2,13 @@ from __future__ import annotations
 import tkinter as tk
 from typing import Iterable, Optional
 
-from utils.music_player import MusicPlayer
 from utils.prefix import shortest_unique_prefixes
 from utils.gui import center_window
 
 
 class ContextCategoryDialog(tk.Toplevel):
     """
-    Modal dialog that lets the user choose a category with optional background music.
+    Modal dialog that lets the user choose a category.
     Usage:
         choice = ContextCategoryDialog.ask(categories, parent=root)
     Returns lowercase category or None if cancelled.
@@ -17,32 +16,14 @@ class ContextCategoryDialog(tk.Toplevel):
 
     KEY_TIMEOUT_MS = 900
 
-    # Class-level music player and settings
-    _music_player = None
-    _music_enabled = True
-
     # ----------------------------------------------------
     # Public API
     # ----------------------------------------------------
     @classmethod
     def ask(cls, categories: Iterable[str], parent: tk.Tk | None = None) -> Optional[str]:
-        # Initialize music player if not already done
-        if cls._music_player is None:
-            cls._music_player = MusicPlayer()
-
         dlg = cls(list(categories), parent)
         dlg.wait_window()  # modal
         return dlg.result
-
-    @classmethod
-    def get_music_enabled(cls) -> bool:
-        """Get the current music setting"""
-        return cls._music_enabled
-
-    @classmethod
-    def set_music_enabled(cls, enabled: bool):
-        """Set the music setting globally"""
-        cls._music_enabled = enabled
 
     # ----------------------------------------------------
     # Internals
@@ -62,16 +43,9 @@ class ContextCategoryDialog(tk.Toplevel):
         self._buffer_job = None
         self._buttons: dict[str, tk.Button] = {}  # Store button references
 
-        # Music control variables
-        self.music_var = tk.BooleanVar(value=self._music_enabled)
-        self.music_started = False
-
         self._build_ui()
         center_window(self)
         self._initial_focus()
-
-        # Handle music based on checkbox state
-        self._handle_music_change()
 
     # ------------------  UI build  ----------------------
     def _build_ui(self) -> None:
@@ -111,27 +85,9 @@ class ContextCategoryDialog(tk.Toplevel):
         # Set initial selection
         self._update_button_styles()
 
-        # Music checkbox - moved here, above confirm/cancel buttons
-        music_frame = tk.Frame(self, bg="#1f2937")
-        music_frame.pack(pady=(10, 5))
-
-        music_checkbox = tk.Checkbutton(
-            music_frame,
-            text="🎵 Play Background Music",
-            variable=self.music_var,
-            command=self._handle_music_change,
-            font=("Arial", 11),
-            fg="white",
-            bg="#1f2937",
-            selectcolor="#374151",
-            activebackground="#1f2937",
-            activeforeground="white"
-        )
-        music_checkbox.pack()
-
         # Confirm/cancel ---------------------------------------------
         bar = tk.Frame(self, bg="#1f2937")
-        bar.pack(pady=(0, 15))
+        bar.pack(pady=(15, 15))
 
         tk.Button(bar, text="✓ Confirm (Enter)",
                   command=self._confirm,
@@ -149,30 +105,6 @@ class ContextCategoryDialog(tk.Toplevel):
 
     def _initial_focus(self) -> None:
         self.focus_set()
-
-    # ------------------  Music handling  ----------------
-    def _handle_music_change(self):
-        """Handle music checkbox state changes"""
-        # Update the class-level setting
-        self.__class__._music_enabled = self.music_var.get()
-
-        if self.music_var.get():
-            # Start music if checkbox is checked and not already playing
-            if not self._music_player.is_playing:
-                success = self._music_player.play_random_music()
-                if success:
-                    self.music_started = True
-                    print("🎵 Music started in context dialog")
-            else:
-                # 이미 재생 중이면 계속 재생
-                self._music_player.ensure_music_playing()
-                self.music_started = True
-                print("🎵 Music continues from previous session")
-        else:
-            # Stop music if checkbox is unchecked
-            if self.music_started:
-                self._music_player.stop_music()
-                self.music_started = False
 
     # ------------------  selection logic ----------------
     def _select(self, cat: str) -> None:
@@ -207,16 +139,10 @@ class ContextCategoryDialog(tk.Toplevel):
 
     def _confirm(self) -> None:
         self.result = self.current.get().lower()
-        self._stop_music_and_close()
+        self.destroy()
 
     def _cancel(self) -> None:
         self.result = None
-        if self.music_started and self._music_player.is_playing:
-            self._music_player.stop_music()
-        self.destroy()
-
-    def _stop_music_and_close(self):
-        """Close dialog but keep music playing for autocomplete process"""
         self.destroy()
 
     # ------------------  buffered shortcut ---------------
