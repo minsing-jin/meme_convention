@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import os
-from meme_convention.setting.meme_adder import MemeAdder
 
 
 class SystemSettingsGUI:
@@ -14,6 +13,8 @@ class SystemSettingsGUI:
             self.root.geometry("800x600")
         else:
             self.root = root
+        self.root.attributes('-topmost', True)
+        self.root.lift()  # 추가로 lift 호출
 
         self.yaml_file_path = yaml_file_path
         self.settings_data = {}
@@ -33,12 +34,7 @@ class SystemSettingsGUI:
         self.settings_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.settings_frame, text="System Settings")
 
-        # Meme Adder tab
-        self.meme_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.meme_frame, text="Meme Adder")
-
         self.create_settings_tab()
-        self.create_meme_tab()
 
     def create_settings_tab(self):
         # File operations frame
@@ -76,10 +72,6 @@ class SystemSettingsGUI:
         # Dictionary to store widgets for dynamic updates
         self.setting_widgets = {}
 
-    def create_meme_tab(self):
-        # Initialize MemeAdder in the meme tab
-        self.meme_adder = MemeAdder(self.contexts)
-
     def load_file_dialog(self):
         file_path = filedialog.askopenfilename(
             title="Select YAML Configuration File",
@@ -97,8 +89,6 @@ class SystemSettingsGUI:
             self.yaml_file_path = file_path
             self.file_label.config(text=f"Loaded: {os.path.basename(file_path)}")
             self.create_setting_widgets()
-
-            messagebox.showinfo("Success", f"Successfully loaded {os.path.basename(file_path)}")
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load YAML file:\n{str(e)}")

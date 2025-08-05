@@ -26,7 +26,7 @@ def classify_context_category(context_category_lst: list[str],
     has_data_for_ai = typing_record or screenshot
 
     if has_data_for_ai:
-        prompt = create_prompt_based_on_text(context_category_lst, typing_record)
+        prompt = create_prompt_based_on_text(system_settings, context_category_lst, typing_record)
         return analyze_context_with_gpt(screenshot, prompt, model)
     else:
         return ContextCategoryDialog.ask(context_category_lst)

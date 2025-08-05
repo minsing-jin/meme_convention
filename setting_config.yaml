@@ -2,10 +2,10 @@ allow_screenshot: true
 context_category: ''
 hot_key: <ctrl>+<shift>+a
 keyboard_recording: true
-music_enabled: true
+music_enabled: false
 user_info:
-  Age: ''
-  Country: ''
-  Interest: ''
-  Job: ''
-  Location: ''
+  Age: '13'
+  Country: korean
+  Interest: game
+  Job: developer
+  Location: seoul
