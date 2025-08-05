@@ -5,14 +5,12 @@ from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
 from dotenv import load_dotenv
 
-# --- 기존 import 및 전역 변수 설정 (변경 없음) ---
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from meme_convention.setting.hotkey import MainThreadExecutor
 from meme_convention.autocomplete.autocomplete import AutoComplete, CONTEXT_CATEGORY_PATH
 from meme_convention.db.local.local import LocalDB
 from meme_convention.setting.meme_adder import MemeAdder
 from meme_convention.recommendar.text_recorder import TypingRecorder
-from utils.utils import load_yaml_file
 
 executor = MainThreadExecutor()
 typing_recorder = TypingRecorder()
@@ -23,7 +21,6 @@ keyboard_listener = None
 config_file_path = 'setting_config.yaml'
 
 
-# --- 기존 함수들 (initialize_settings_config, load_settings, save_settings, etc.) (변경 없음) ---
 def initialize_settings_config():
     if not os.path.exists(config_file_path):
         config_data = {
@@ -98,14 +95,8 @@ def show_meme_adder():
     executor.add_task(show_meme_adder_main_thread)
 
 
-# ======================================================================
-# ===== 변경된 부분 시작 =====
-# ======================================================================
-
-# 현재 눌린 키를 추적하기 위한 집합(set)
 current_keys = set()
 
-# 단축키와 실행할 함수를 매핑
 HOTKEYS = {}
 
 
@@ -158,7 +149,6 @@ def on_press(key):
             function()
     current_keys.add(key)
 
-    # 특정 기능 키 무시
     if key in [Key.f12, Key.f1, Key.f2, Key.f11,
                Key.media_volume_up, Key.media_volume_down, Key.media_volume_mute,
                Key.ctrl, Key.ctrl_l, Key.ctrl_r, Key.shift, Key.shift_l, Key.shift_r,
@@ -191,7 +181,6 @@ def on_release(key):
     try:
         current_keys.remove(key)
     except KeyError:
-        # 리스너가 시작되기 전에 이미 눌려있던 키가 떼어질 때 발생할 수 있음
         pass
 
 
