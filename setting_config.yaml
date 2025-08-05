@@ -1,0 +1,11 @@
+allow_screenshot: true
+context_category: ''
+hot_key: <ctrl>+<shift>+a
+keyboard_recording: true
+music_enabled: true
+user_info:
+  Age: ''
+  Country: ''
+  Interest: ''
+  Job: ''
+  Location: ''
