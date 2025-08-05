@@ -1,6 +1,4 @@
 from pathlib import Path
-import tkinter as tk
-import yaml
 import os
 
 from meme_convention.recommendar.recommender import classify_context_category
