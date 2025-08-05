@@ -1,258 +1,259 @@
+import yaml
 import tkinter as tk
-from tkinter import ttk, messagebox
-from typing import Dict, Any
-from .setting_configuration import SystemSettingsConfiguration, SystemSettingsModel
+from tkinter import ttk, messagebox, filedialog
+from tkinterdnd2 import DND_FILES, TkinterDnD
+import os
 from meme_convention.setting.meme_adder import MemeAdder
 
-# TODO: add music add feature
+
 class SystemSettingsGUI:
-    def __init__(self, settings_manager: SystemSettingsConfiguration = None):
-        self.settings_manager = settings_manager or SystemSettingsConfiguration()
-        self.root = None
-        self.widgets = {}
-        self.meme_adder = None  # Add this line
+    def __init__(self, root=None, yaml_file_path=None, contexts=None):
+        if root is None:
+            self.root = TkinterDnD.Tk()  # Changed to TkinterDnD.Tk for drag-drop support
+            self.root.title("System Settings Manager")
+            self.root.geometry("800x600")
+        else:
+            self.root = root
 
-    def create_gui(self):
-        """Create the main GUI window"""
-        self.root = tk.Tk()
-        self.root.title("System Settings")
-        self.root.geometry("600x500")
-        self.root.resizable(True, True)
+        self.yaml_file_path = yaml_file_path
+        self.settings_data = {}
+        self.contexts = contexts
 
+        self.create_widgets()
+
+        if yaml_file_path and os.path.exists(yaml_file_path):
+            self.load_yaml_file(yaml_file_path)
+
+    def create_widgets(self):
         # Create notebook for tabs
-        notebook = ttk.Notebook(self.root)
-        notebook.pack(fill='both', expand=True, padx=10, pady=10)
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Create tabs
-        self.create_general_tab(notebook)
-        self.create_user_info_tab(notebook)
-        self.create_meme_contexts_tab(notebook)
+        # Settings tab
+        self.settings_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.settings_frame, text="System Settings")
 
-        # Create buttons frame
-        button_frame = ttk.Frame(self.root)
-        button_frame.pack(fill='x', padx=10, pady=(0, 10))
+        # Meme Adder tab
+        self.meme_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.meme_frame, text="Meme Adder")
 
-        # Buttons
-        ttk.Button(button_frame, text="Save", command=self.save_settings).pack(side='right', padx=(5, 0))
-        ttk.Button(button_frame, text="Cancel", command=self.cancel).pack(side='right')
-        ttk.Button(button_frame, text="Reset to Default", command=self.reset_to_default).pack(side='left')
+        self.create_settings_tab()
+        self.create_meme_tab()
 
-        # Add Meme Adder button
-        ttk.Button(button_frame, text="Open Meme Adder",
-                   command=self.open_meme_adder).pack(side='left', padx=(10, 0))
+    def create_settings_tab(self):
+        # File operations frame
+        file_frame = ttk.LabelFrame(self.settings_frame, text="File Operations", padding=10)
+        file_frame.pack(fill="x", padx=10, pady=5)
 
-        # Load current settings
-        self.load_current_settings()
+        ttk.Button(file_frame, text="Load YAML File", command=self.load_file_dialog).pack(side="left", padx=5)
+        ttk.Button(file_frame, text="Save Changes", command=self.save_yaml_file).pack(side="left", padx=5)
+        ttk.Button(file_frame, text="Apply Changes", command=self.apply_changes).pack(side="left", padx=5)
 
-    def open_meme_adder(self):
-        """Open the meme adder window with current contexts"""
-        try:
-            # Get current meme contexts from the listbox
-            current_contexts = []
-            for i in range(self.widgets['meme_contexts_listbox'].size()):
-                current_contexts.append(self.widgets['meme_contexts_listbox'].get(i))
+        # Current file label
+        self.file_label = ttk.Label(file_frame, text="No file loaded")
+        self.file_label.pack(side="right", padx=5)
 
-            if not current_contexts:
-                messagebox.showwarning("No Contexts",
-                                       "Please add some meme contexts first before opening the meme adder!")
-                return
-
-            # Create and show meme adder
-            self.meme_adder = MemeAdder(current_contexts)
-            self.meme_adder.show_meme_adder_window()
-
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to open meme adder: {str(e)}")
-
-    def create_general_tab(self, notebook):
-        """Create the general settings tab"""
-        frame = ttk.Frame(notebook)
-        notebook.add(frame, text="General")
-
-        # Music enabled
-        self.widgets['music_enabled'] = tk.BooleanVar()
-        ttk.Checkbutton(frame, text="Enable Music Playback",
-                        variable=self.widgets['music_enabled']).pack(anchor='w', pady=5)
-
-        # Keyboard recording
-        self.widgets['keyboard_recording'] = tk.BooleanVar()
-        ttk.Checkbutton(frame, text="Enable Keyboard Recording",
-                        variable=self.widgets['keyboard_recording']).pack(anchor='w', pady=5)
-
-        # Allow screenshot
-        self.widgets['allow_screenshot'] = tk.BooleanVar()
-        ttk.Checkbutton(frame, text="Allow Screenshots",
-                        variable=self.widgets['allow_screenshot']).pack(anchor='w', pady=5)
-
-        # Hotkey setting
-        hotkey_frame = ttk.LabelFrame(frame, text="Hotkey Settings", padding=10)
-        hotkey_frame.pack(fill='x', pady=10)
-
-        ttk.Label(hotkey_frame, text="System Settings Hotkey:").pack(anchor='w')
-        self.widgets['hot_key'] = tk.StringVar()
-        ttk.Entry(hotkey_frame, textvariable=self.widgets['hot_key'], width=30).pack(anchor='w', pady=5)
-
-    def create_user_info_tab(self, notebook):
-        """Create the user information tab"""
-        frame = ttk.Frame(notebook)
-        notebook.add(frame, text="User Info")
+        # Settings configuration frame
+        config_frame = ttk.LabelFrame(self.settings_frame, text="Settings Configuration", padding=10)
+        config_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
         # Create scrollable frame
-        canvas = tk.Canvas(frame)
-        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = ttk.Frame(canvas)
+        canvas = tk.Canvas(config_frame)
+        scrollbar = ttk.Scrollbar(config_frame, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = ttk.Frame(canvas)
 
-        scrollable_frame.bind(
+        self.scrollable_frame.bind(
             "<Configure>",
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
 
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
-
-        # User info fields
-        self.widgets['user_info'] = {}
-        user_info_fields = ['Age', 'Interest', 'Country', 'Location', 'Job']
-
-        for field in user_info_fields:
-            field_frame = ttk.Frame(scrollable_frame)
-            field_frame.pack(fill='x', pady=5)
-
-            ttk.Label(field_frame, text=f"{field}:", width=15).pack(side='left')
-            self.widgets['user_info'][field] = tk.StringVar()
-            ttk.Entry(field_frame, textvariable=self.widgets['user_info'][field],
-                      width=40).pack(side='left', fill='x', expand=True)
 
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-    def create_meme_contexts_tab(self, notebook):
-        """Create the meme contexts tab"""
-        frame = ttk.Frame(notebook)
-        notebook.add(frame, text="Meme Contexts")
+        # Dictionary to store widgets for dynamic updates
+        self.setting_widgets = {}
 
-        # Meme contexts listbox with scrollbar
-        list_frame = ttk.LabelFrame(frame, text="Current Meme Contexts", padding=10)
-        list_frame.pack(fill='both', expand=True, pady=5)
+    def create_meme_tab(self):
+        # Initialize MemeAdder in the meme tab
+        self.meme_adder = MemeAdder(self.contexts)
 
-        listbox_frame = ttk.Frame(list_frame)
-        listbox_frame.pack(fill='both', expand=True)
+    def load_file_dialog(self):
+        file_path = filedialog.askopenfilename(
+            title="Select YAML Configuration File",
+            filetypes=[("YAML files", "*.yaml *.yml"), ("All files", "*.*")]
+        )
 
-        self.widgets['meme_contexts_listbox'] = tk.Listbox(listbox_frame)
-        scrollbar_meme = ttk.Scrollbar(listbox_frame, orient="vertical",
-                                       command=self.widgets['meme_contexts_listbox'].yview)
-        self.widgets['meme_contexts_listbox'].configure(yscrollcommand=scrollbar_meme.set)
+        if file_path:
+            self.load_yaml_file(file_path)
 
-        self.widgets['meme_contexts_listbox'].pack(side="left", fill="both", expand=True)
-        scrollbar_meme.pack(side="right", fill="y")
-
-        # Add/Remove buttons
-        button_frame = ttk.Frame(list_frame)
-        button_frame.pack(fill='x', pady=(10, 0))
-
-        # Entry for new context
-        self.widgets['new_context'] = tk.StringVar()
-        ttk.Entry(button_frame, textvariable=self.widgets['new_context'],
-                  width=30).pack(side='left', fill='x', expand=True)
-
-        ttk.Button(button_frame, text="Add", command=self.add_meme_context).pack(side='right', padx=(5, 0))
-        ttk.Button(button_frame, text="Remove Selected",
-                   command=self.remove_meme_context).pack(side='right')
-
-    def load_current_settings(self):
-        """Load current settings from the configuration"""
-        settings = self.settings_manager.get_settings()
-
-        # Load general settings
-        self.widgets['music_enabled'].set(settings.music_enabled)
-        self.widgets['keyboard_recording'].set(settings.keyboard_recording)
-        self.widgets['allow_screenshot'].set(settings.allow_screenshot)
-        self.widgets['hot_key'].set(settings.hot_key)
-
-        # Load user info
-        for key, value in settings.user_info.items():
-            if key in self.widgets['user_info']:
-                self.widgets['user_info'][key].set(value)
-
-        # Load meme contexts
-        self.widgets['meme_contexts_listbox'].delete(0, tk.END)
-        for context in settings.meme_contexts:
-            self.widgets['meme_contexts_listbox'].insert(tk.END, context)
-
-    def save_settings(self):
-        """Save current settings to configuration"""
+    def load_yaml_file(self, file_path):
         try:
-            # Collect general settings
-            settings_data = {
-                'music_enabled': self.widgets['music_enabled'].get(),
-                'keyboard_recording': self.widgets['keyboard_recording'].get(),
-                'allow_screenshot': self.widgets['allow_screenshot'].get(),
-                'hot_key': self.widgets['hot_key'].get(),
-            }
+            with open(file_path, 'r', encoding='utf-8') as file:
+                self.settings_data = yaml.safe_load(file) or {}
 
-            # Collect user info
-            user_info = {}
-            for key, var in self.widgets['user_info'].items():
-                user_info[key] = var.get()
-            settings_data['user_info'] = user_info
+            self.yaml_file_path = file_path
+            self.file_label.config(text=f"Loaded: {os.path.basename(file_path)}")
+            self.create_setting_widgets()
 
-            # Collect meme contexts
-            meme_contexts = []
-            for i in range(self.widgets['meme_contexts_listbox'].size()):
-                meme_contexts.append(self.widgets['meme_contexts_listbox'].get(i))
-            settings_data['meme_contexts'] = meme_contexts
-
-            # Update settings
-            if self.settings_manager.update_settings(**settings_data):
-                messagebox.showinfo("Success", "Settings saved successfully!")
-                self.root.destroy()
-            else:
-                messagebox.showerror("Error", "Failed to save settings!")
+            messagebox.showinfo("Success", f"Successfully loaded {os.path.basename(file_path)}")
 
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to save settings: {str(e)}")
+            messagebox.showerror("Error", f"Failed to load YAML file:\n{str(e)}")
 
-    def cancel(self):
-        """Cancel and close the window"""
-        self.root.destroy()
+    def create_setting_widgets(self):
+        # Clear existing widgets
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+        self.setting_widgets.clear()
 
-    def reset_to_default(self):
-        """Reset all settings to default values"""
-        if messagebox.askyesno("Confirm Reset", "Are you sure you want to reset all settings to default?"):
-            default_settings = SystemSettingsModel()
-            settings_data = default_settings.model_dump()
+        # Create widgets for each setting
+        row = 0
+        for key, value in self.settings_data.items():
+            self.create_widget_for_setting(key, value, row)
+            row += 1
 
-            if self.settings_manager.update_settings(**settings_data):
-                self.load_current_settings()
-                messagebox.showinfo("Success", "Settings reset to default!")
+    def create_widget_for_setting(self, key, value, row, parent=None, prefix=""):
+        if parent is None:
+            parent = self.scrollable_frame
+
+        full_key = f"{prefix}{key}" if prefix else key
+
+        if isinstance(value, bool):
+            var = tk.BooleanVar(value=value)
+            widget = ttk.Checkbutton(parent, text=key, variable=var)
+            widget.grid(row=row, column=0, columnspan=2, sticky="w", padx=5, pady=2)
+            self.setting_widgets[full_key] = var
+
+        elif isinstance(value, (int, float)):
+            ttk.Label(parent, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5, pady=2)
+            var = tk.StringVar(value=str(value))
+            entry = ttk.Entry(parent, textvariable=var, width=30)
+            entry.grid(row=row, column=1, sticky="w", padx=5, pady=2)
+            self.setting_widgets[full_key] = var
+
+        elif isinstance(value, str):
+            ttk.Label(parent, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5, pady=2)
+            var = tk.StringVar(value=value)
+            entry = ttk.Entry(parent, textvariable=var, width=30)
+            entry.grid(row=row, column=1, sticky="w", padx=5, pady=2)
+            self.setting_widgets[full_key] = var
+
+        elif isinstance(value, dict):
+            # Create a labeled frame for nested dictionaries
+            frame = ttk.LabelFrame(parent, text=key, padding=5)
+            frame.grid(row=row, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
+
+            nested_row = 0
+            for nested_key, nested_value in value.items():
+                self.create_widget_for_setting(
+                    nested_key, nested_value, nested_row,
+                    frame, f"{full_key}."
+                )
+                nested_row += 1
+
+        elif isinstance(value, list):
+            ttk.Label(parent, text=f"{key} (list):").grid(row=row, column=0, sticky="w", padx=5, pady=2)
+            var = tk.StringVar(value=", ".join(map(str, value)))
+            entry = ttk.Entry(parent, textvariable=var, width=30)
+            entry.grid(row=row, column=1, sticky="w", padx=5, pady=2)
+            self.setting_widgets[full_key] = var
+
+    def collect_settings_data(self):
+        """Collect data from all widgets and reconstruct the settings dictionary"""
+        new_data = {}
+
+        for full_key, widget_var in self.setting_widgets.items():
+            keys = full_key.split('.')
+            current_dict = new_data
+
+            # Navigate/create nested structure
+            for key in keys[:-1]:
+                if key not in current_dict:
+                    current_dict[key] = {}
+                current_dict = current_dict[key]
+
+            # Set the value
+            final_key = keys[-1]
+            value = widget_var.get()
+
+            # Try to convert to appropriate type
+            if isinstance(widget_var, tk.BooleanVar):
+                current_dict[final_key] = value
+            elif value.strip() == "":
+                current_dict[final_key] = ""
             else:
-                messagebox.showerror("Error", "Failed to reset settings!")
+                # Try to detect and convert the type
+                original_value = self.get_original_value(full_key)
+                if isinstance(original_value, list):
+                    # Handle list values
+                    if value.strip():
+                        current_dict[final_key] = [item.strip() for item in value.split(',')]
+                    else:
+                        current_dict[final_key] = []
+                elif isinstance(original_value, int):
+                    try:
+                        current_dict[final_key] = int(value)
+                    except ValueError:
+                        current_dict[final_key] = value
+                elif isinstance(original_value, float):
+                    try:
+                        current_dict[final_key] = float(value)
+                    except ValueError:
+                        current_dict[final_key] = value
+                else:
+                    current_dict[final_key] = value
 
-    def add_meme_context(self):
-        """Add a new meme context"""
-        new_context = self.widgets['new_context'].get().strip()
-        if new_context:
-            # Check if context already exists
-            existing_contexts = []
-            for i in range(self.widgets['meme_contexts_listbox'].size()):
-                existing_contexts.append(self.widgets['meme_contexts_listbox'].get(i))
+        return new_data
 
-            if new_context not in existing_contexts:
-                self.widgets['meme_contexts_listbox'].insert(tk.END, new_context)
-                self.widgets['new_context'].set("")  # Clear entry
+    def get_original_value(self, full_key):
+        """Get the original value for type detection"""
+        keys = full_key.split('.')
+        current = self.settings_data
+
+        for key in keys:
+            if isinstance(current, dict) and key in current:
+                current = current[key]
             else:
-                messagebox.showwarning("Duplicate", "This context already exists!")
-        else:
-            messagebox.showwarning("Empty Context", "Please enter a context name!")
+                return ""
 
-    def remove_meme_context(self):
-        """Remove selected meme context"""
-        selection = self.widgets['meme_contexts_listbox'].curselection()
-        if selection:
-            self.widgets['meme_contexts_listbox'].delete(selection[0])
-        else:
-            messagebox.showwarning("No Selection", "Please select a context to remove!")
+        return current
+
+    def apply_changes(self):
+        """Apply changes to the internal data structure immediately"""
+        try:
+            self.settings_data = self.collect_settings_data()
+            messagebox.showinfo("Success", "Changes applied successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to apply changes:\n{str(e)}")
+
+    def save_yaml_file(self):
+        """Save the current settings to the YAML file"""
+        if not self.yaml_file_path:
+            file_path = filedialog.asksaveasfilename(
+                title="Save YAML Configuration File",
+                defaultextension=".yaml",
+                filetypes=[("YAML files", "*.yaml *.yml"), ("All files", "*.*")]
+            )
+            if not file_path:
+                return
+            self.yaml_file_path = file_path
+
+        try:
+            # First apply changes to internal data
+            self.settings_data = self.collect_settings_data()
+
+            # Then save to file
+            with open(self.yaml_file_path, 'w', encoding='utf-8') as file:
+                yaml.dump(self.settings_data, file, default_flow_style=False, sort_keys=False)
+
+            messagebox.showinfo("Success", f"Settings saved to {os.path.basename(self.yaml_file_path)}")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save YAML file:\n{str(e)}")
 
     def run(self):
-        """Run the GUI"""
-        self.create_gui()
+        if hasattr(self, 'root'):
+            self.root.mainloop()

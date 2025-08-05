@@ -1,25 +1,22 @@
 from pathlib import Path
 import tkinter as tk
+import yaml
 import os
 
-from meme_convention.setting.setting_configuration import SystemSettingsConfiguration
 from meme_convention.recommendar.recommender import classify_context_category
 from meme_convention.recommendar.text_recorder import TypingRecorder
 from meme_convention.setting.music_player import MusicPlayer
 from meme_convention.frontend.meme_selection import *
+from utils.utils import load_yaml_file
 
 CONTEXT_CATEGORY_PATH = os.path.join(Path(__file__).parent.parent.parent, 'resources', 'local_db')
 
 
 # TODO: Add hot key condition that will trigger recommend and the autocomplete function
 # TODO: Have to consider whether model is instance or string model name.
-# TODO: 할것들: system_setting을 pydantic으로 받고 setting값으로 각각 받기
-#  , context_category_dialog 인스턴스 받기
 class AutoComplete:
-    # In your AutoComplete.__init__ method, modify:
     def __init__(self, db,
                  typing_recorder: TypingRecorder,
-                 system_settings: SystemSettingsConfiguration,
                  analysis_model="gpt-4o-mini",
                  ):
         self.get_image_from_db_func = db.get_random_meme
@@ -28,8 +25,9 @@ class AutoComplete:
         self.root = None
 
         self.typing_recorder = typing_recorder
-        self.system_settings = system_settings
-        self.music_enabled = system_settings.get_settings().music_enabled
+
+        self.system_settings = load_yaml_file('setting_config.yaml')
+        self.music_enabled = self.system_settings['music_enabled']
 
         # Initialize music player only if enabled
         if self.music_enabled:
@@ -47,10 +45,11 @@ class AutoComplete:
         2. Autocomplete the multimodal based on the model and context category in the future.
         3. Autocomplete in user's text box and page image context.
         """
-        context_category_lst = [name for name in os.listdir(CONTEXT_CATEGORY_PATH) if os.path.isdir(os.path.join(CONTEXT_CATEGORY_PATH, name))]
+        context_category_lst = [name for name in os.listdir(CONTEXT_CATEGORY_PATH) if
+                                os.path.isdir(os.path.join(CONTEXT_CATEGORY_PATH, name))]
         try:
             context = classify_context_category(context_category_lst,
-                                                self.system_settings.get_settings().allow_screenshot,
+                                                self.system_settings,
                                                 self.typing_recorder,
                                                 model=self.analysis_model)
             print(f"Context category selected: {context}")
@@ -95,7 +94,6 @@ class AutoComplete:
         if self.music_enabled and self.music_player:
             current_song = self.music_player.current_track or "Unknown"
             self.root.title(f"Select your meme! 🎵 {current_song}")
-            # 음악 연속성 한 번 더 확인
             self.music_player.ensure_music_playing()
         else:
             self.root.title("Select your meme!")
@@ -124,16 +122,27 @@ class AutoComplete:
                                get_image_func=self.get_image_from_db_func)
         gui.autocomplete_ref = self
 
-        # Create buttons
-        btn_accept = tk.Button(self.root, text="Accept (Ctrl + c | Cmd + c)", command=gui.accept)
-        btn_accept.pack(side="left", padx=10, pady=10)
+        # Create button frame
+        button_frame = tk.Frame(self.root)
+        button_frame.pack(pady=10)
 
-        btn_reject = tk.Button(self.root, text="Next Meme (Up/Down key)", command=gui.reject)
-        btn_reject.pack(side="left", padx=10, pady=10)
+        btn_accept = tk.Button(button_frame, text="Accept (Ctrl + c | Cmd + c)", command=gui.accept)
+        btn_accept.grid(row=0, column=0, padx=5)
 
-        btn_quit = tk.Button(self.root, text="Exit (esc)",
-                             command=lambda: self._handle_exit())
-        btn_quit.pack(side="left", padx=10, pady=10)
+        btn_reject = tk.Button(button_frame, text="Next Meme (Up/Down key)", command=gui.reject)
+        btn_reject.grid(row=0, column=1, padx=5)
+
+        btn_quit = tk.Button(button_frame, text="Exit (esc)", command=lambda: self._handle_exit())
+        btn_quit.grid(row=0, column=2, padx=5)
+
+        # ✅ 추가: System Settings 버튼
+        def open_settings():
+            from meme_convention.setting.system_setting_gui import SystemSettingsGUI
+            settings_window = tk.Toplevel(self.root)
+            SystemSettingsGUI(root=settings_window, yaml_file_path='setting_config.yaml')
+
+        btn_settings = tk.Button(button_frame, text="⚙️ System Settings", command=open_settings)
+        btn_settings.grid(row=0, column=3, padx=5)
 
         # Bind keyboard shortcuts
         self.root.bind('<Control-c>', gui.accept)
@@ -142,10 +151,8 @@ class AutoComplete:
         self.root.bind('<Down>', gui.reject)
         self.root.bind('<Escape>', self.quit_and_cleanup)
 
-        # Handle window close button
         self.root.protocol("WM_DELETE_WINDOW", self.quit_and_cleanup)
 
-        # TODO: mainloop is necessary? When I run the autocomplete function, it will block the main thread.
         self.root.mainloop()
         return self.accepted_image if self.accepted_image else None
 
