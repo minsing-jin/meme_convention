@@ -1,5 +1,5 @@
 
-# 👾Meme convention
+(# 👾Githubticon (Meme convention)
 
 > _"Needed explaining, That humor flopped."_  
 >  — Youtuber Shuka World-
@@ -40,8 +40,8 @@ uv run ./meme_convention/main.py
 
 4. When meme convention is running, you can use the meme recommend feature and meme add feature.
 ```bash
-1. meme recommend : shift + ctrl or cmd + M
-2. meme add : shift + ctrl or cmd + A 
+1. meme recommend : shift + ctrl + M
+2. meme add : shift + ctrl + A 
 After that, if you drag and drop a meme image to the text area, it will be added to the local db.
 ```
 
